@@ -1,0 +1,34 @@
+---
+// test.astro - página de diagnóstico
+const STRAPI_URL = import.meta.env.STRAPI_URL || "No definida";
+---
+
+<html>
+  <head><title>Diagnóstico</title></head>
+  <body>
+    <h1>Diagnóstico del Frontend</h1>
+    <p>STRAPI_URL: <strong>{STRAPI_URL}</strong></p>
+    
+    <h2>Verificar conexión a Railway:</h2>
+    <pre id="resultado">Cargando...</pre>
+    
+    <script>
+      const url = "{STRAPI_URL}";
+      if (url && url !== "No definida") {
+        fetch(`${url}/api/products`)
+          .then(res => res.json())
+          .then(data => {
+            document.getElementById('resultado').innerHTML = 
+              `✅ Conexión exitosa. Productos encontrados: ${data.data?.length || 0}`;
+          })
+          .catch(err => {
+            document.getElementById('resultado').innerHTML = 
+              `❌ Error: ${err.message}`;
+          });
+      } else {
+        document.getElementById('resultado').innerHTML = 
+          `❌ STRAPI_URL no está definida en las variables de entorno`;
+      }
+    </script>
+  </body>
+</html>
