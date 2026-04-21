@@ -1,0 +1,10 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CheckoutForm from "../components/CheckoutForm.jsx";
+---
+
+<Layout title="Checkout">
+  <h1>Finalizar pedido</h1>
+
+  <CheckoutForm client:load />
+</Layout>

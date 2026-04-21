@@ -1,0 +1,37 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getProductos, getStrapiMedia } from "../services/api";
+import AddToCart from "../components/AddToCart.jsx";
+import Cart from "../components/Cart.jsx";
+
+const productos = await getProductos();
+---
+
+<Layout title="Tienda">
+  <h1>Productos</h1>
+ <Cart client:load />
+ 
+  <div class="sticky-checkout">
+    <button
+      class="btn-sticky"
+      onclick="window.location.href='/checkout'"
+    >
+      🛒 Finalizar compra ahora
+    </button>
+  </div>
+
+  <div class="productos-grid">
+    {productos.map(p => (
+      <div class="card">
+        <img src={getStrapiMedia(p.imagen.url)} />
+
+        <div class="card-body">
+          <h3>{p.nombre}</h3>
+          <p class="precio">${p.precio}</p>
+
+          <AddToCart client:load product={p} />
+        </div>
+      </div>
+    ))}
+  </div>
+</Layout>

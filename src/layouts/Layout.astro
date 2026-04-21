@@ -1,0 +1,27 @@
+---
+const { title } = Astro.props;
+import "../styles/global.css";
+import CartCount from "../components/CartCount.jsx";
+---
+
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{title}</title>
+  </head>
+  <body>
+
+    <!-- 🔝 HEADER -->
+    <header class="header">
+      <h2>🛒 Mi Tienda</h2>
+      
+      <CartCount client:load />
+    </header>
+
+    <!-- 📦 CONTENIDO -->
+    <main class="container">
+      <slot />
+    </main>
+
+  </body>
+</html>
