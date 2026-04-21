@@ -5,6 +5,14 @@ import AddToCart from "../components/AddToCart.jsx";
 import Cart from "../components/Cart.jsx";
 
 const productos = await getProductos();
+
+// 🔍 LOG TEMPORAL PARA DEPURAR
+console.log("Productos:", productos);
+productos.forEach((p, i) => {
+  if (!p.imagen) {
+    console.error(`Producto ${i} (${p.nombre}) no tiene imagen:`, p);
+  }
+});
 ---
 
 <Layout title="Tienda">
@@ -23,7 +31,10 @@ const productos = await getProductos();
   <div class="productos-grid">
     {productos.map(p => (
       <div class="card">
-        <img src={getStrapiMedia(p.imagen.url)} />
+        
+        <img 
+          src={p.imagen?.url ? getStrapiMedia(p.imagen.url) : '/placeholder.jpg'} 
+        />
 
         <div class="card-body">
           <h3>{p.nombre}</h3>

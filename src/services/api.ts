@@ -4,7 +4,10 @@ const API_URL = import.meta.env.STRAPI_URL
   : "http://localhost:1337/api";
 
 export function getStrapiMedia(url: string | null | undefined): string {
-  if (!url) return '';
+  if (!url) {
+    console.warn("URL de imagen no válida:", url);
+    return "https://placehold.co/400x400?text=Sin+Imagen"; // Placeholder
+  }
   if (url.startsWith('http')) return url;
   const baseUrl = import.meta.env.STRAPI_URL || "http://localhost:1337";
   return `${baseUrl}${url}`;
@@ -38,7 +41,13 @@ export async function getProductos() {
 
     const data = await res.json();
 
-    return data.data || [];
+    return (data.data || []).map(producto => ({
+      ...producto,
+      imagen: producto.imagen?.url 
+        ? { url: producto.imagen.url }
+        : null,
+
+    }));
   } catch (error) {
     console.error("Error cargando productos:", error);
     return [];
