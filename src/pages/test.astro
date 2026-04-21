@@ -1,34 +1,66 @@
 ---
-// test.astro - página de diagnóstico
+// test.astro - página de diagnóstico (versión corregida)
 const STRAPI_URL = import.meta.env.STRAPI_URL || "No definida";
+const API_URL = STRAPI_URL !== "No definida" ? `${STRAPI_URL}/api` : null;
 ---
 
 <html>
-  <head><title>Diagnóstico</title></head>
+  <head>
+    <title>Diagnóstico</title>
+    <meta charset="UTF-8">
+  </head>
   <body>
-    <h1>Diagnóstico del Frontend</h1>
-    <p>STRAPI_URL: <strong>{STRAPI_URL}</strong></p>
+    <h1>🔍 Diagnóstico del Frontend</h1>
     
-    <h2>Verificar conexión a Railway:</h2>
-    <pre id="resultado">Cargando...</pre>
+    <h2>Variables de entorno:</h2>
+    <pre>STRAPI_URL: <strong id="strapi-url-value">{STRAPI_URL}</strong></pre>
     
+    <h2>Verificando conexión a Railway:</h2>
+    <div id="resultado">🔄 Probando conexión...</div>
+    
+    <h2>Detalles de la petición:</h2>
+    <pre id="detalles"></pre>
+
     <script>
-      const url = "{STRAPI_URL}";
-      if (url && url !== "No definida") {
-        fetch(`${url}/api/products`)
-          .then(res => res.json())
+      // Obtenemos la URL desde el atributo data
+      const strapiUrl = document.getElementById('strapi-url-value').innerText;
+      
+      if (strapiUrl && strapiUrl !== "No definida") {
+        const apiUrl = `${strapiUrl}/api/products?populate=*`;
+        
+        document.getElementById('detalles').innerHTML = `🌐 URL completa: ${apiUrl}`;
+        
+        fetch(apiUrl)
+          .then(res => {
+            document.getElementById('detalles').innerHTML += `\n📡 Status: ${res.status} ${res.statusText}`;
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+          })
           .then(data => {
+            const cantidad = data.data?.length || 0;
             document.getElementById('resultado').innerHTML = 
-              `✅ Conexión exitosa. Productos encontrados: ${data.data?.length || 0}`;
+              `✅ <span style="color: green;">Conexión exitosa!</span><br>📦 Productos encontrados: ${cantidad}`;
+            document.getElementById('detalles').innerHTML += `\n✅ Productos: ${cantidad}`;
           })
           .catch(err => {
             document.getElementById('resultado').innerHTML = 
-              `❌ Error: ${err.message}`;
+              `❌ <span style="color: red;">Error: ${err.message}</span>`;
+            document.getElementById('detalles').innerHTML += `\n❌ Error: ${err.message}`;
           });
       } else {
         document.getElementById('resultado').innerHTML = 
-          `❌ STRAPI_URL no está definida en las variables de entorno`;
+          `❌ <span style="color: red;">STRAPI_URL no está definida en las variables de entorno de Cloudflare Pages</span>`;
+        document.getElementById('detalles').innerHTML = `⚠️ Revisa: Settings → Environment Variables`;
       }
     </script>
+    
+    <hr />
+    <h3>📋 Próximos pasos según el resultado:</h3>
+    <ul>
+      <li><strong>Si ves "STRAPI_URL no está definida"</strong> → Añade la variable en Cloudflare Pages y redeploya</li>
+      <li><strong>Si ves "Conexión exitosa" con productos</strong> → El problema está en tu código principal</li>
+      <li><strong>Si ves un error HTTP 404</strong> → La URL de Railway es incorrecta</li>
+      <li><strong>Si ves un error CORS</strong> → Strapi necesita configuración adicional</li>
+    </ul>
   </body>
 </html>
