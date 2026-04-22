@@ -104,12 +104,7 @@ h1, h2, h3 {
 }
 
 button {
-  margin-left: 10px;
-  background: red;
-  color: white;
   border: none;
-  padding: 4px 8px;
-  border-radius: 4px;
   cursor: pointer;
 }
 
@@ -376,4 +371,75 @@ input, textarea {
 
 .btn-success:hover {
   background: #27ae60;
+}
+
+/* 📱 MOBILE FIRST AJUSTES */
+@media (max-width: 600px) {
+
+  body {
+    font-size: 16px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  /* 🧱 GRID MÁS FLEXIBLE */
+  .productos-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* 🖼 IMÁGENES MÁS PROPORCIONADAS */
+  .product-img,
+  .card img {
+    height: 160px;
+  }
+
+  /* 🧾 TARJETAS MÁS CÓMODAS */
+  .card-body {
+    padding: 1rem;
+  }
+
+  /* 🔘 BOTONES MÁS GRANDES */
+  .btn,
+  .btn-primary,
+  .btn-sticky,
+  .btn-back {
+    font-size: 16px;
+    padding: 12px;
+    min-height: 44px;
+  }
+
+  /* ❌ BOTONES PEQUEÑOS → AGRANDAR */
+  .qty-controls button,
+  .remove-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  /* 🧾 FORMULARIOS MÁS CÓMODOS */
+  input,
+  textarea {
+    font-size: 16px;
+    padding: 10px;
+  }
+
+  /* 🔝 HEADER FLEXIBLE */
+  .header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* 🛒 BOTÓN STICKY MEJOR POSICIÓN */
+  .sticky-checkout {
+    bottom: 15px;
+    right: 15px;
+  }
+
 }
