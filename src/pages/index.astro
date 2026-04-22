@@ -1,4 +1,5 @@
 ---
+export const prerender = false;
 import Layout from "../layouts/Layout.astro";
 import { getProductos, getStrapiMedia } from "../services/api";
 import AddToCart from "../components/AddToCart.jsx";
@@ -12,36 +13,32 @@ const formatPrice = (v) => new Intl.NumberFormat("es-ES").format(v);
 ---
 
 <Layout title="Tienda">
-  <h1>Productos</h1>
+  <!-- 🛒 CARRITO -->
+  <section class="cart-section">
+    <Cart client:load />
+  </section>
 
-  <Cart client:load />
+  <!-- 📦 PRODUCTOS -->
+  <section class="products-section">
+    <h1>Productos</h1>
 
-  <!-- 🟢 BOTÓN STICKY -->
-  <div class="sticky-checkout">
-    <a href="/checkout" class="btn-sticky">
-      🛒 Finalizar compra ahora
-    </a>
-  </div>
+    <div class="productos-grid">
+      {productos.map(p => (
+        <div class="card">
+          <SafeImage
+            src={getStrapiMedia(p.imagen?.url)}
+            alt={p.nombre}
+            className="product-img"
+          />
 
-  <!-- 🧱 GRID -->
-  <div class="productos-grid">
-    {(productos || []).map(p => (
-      <div class="card">
+          <div class="card-body">
+            <h3>{p.nombre}</h3>
+            <p class="precio">${formatPrice(p.precio)}</p>
 
-        <SafeImage
-          src={getStrapiMedia(p.imagen?.url)}
-          alt={p.nombre}
-          className="product-img"
-        />
-
-        <div class="card-body">
-          <h3>{p.nombre}</h3>
-          <p class="precio">${formatPrice(p.precio)}</p>
-
-          <AddToCart client:load product={p} />
+            <AddToCart client:load product={p} />
+          </div>
         </div>
-
-      </div>
-    ))}
-  </div>
+      ))}
+    </div>
+  </section>
 </Layout>

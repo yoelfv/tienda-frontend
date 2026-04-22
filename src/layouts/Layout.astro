@@ -24,12 +24,9 @@ const { title = "Mi Tienda" } = Astro.props;
     <!-- 🔝 HEADER -->
     <header class="header">
       <div class="header-inner">
-        <a href="/" class="logo">🛒 Mi Tienda</a>
-
-        <nav>
-          <CartCount client:load />
-        </nav>
-      </div>
+        <h2>🛒 Mi Tienda</h2>
+        <CartCount client:load />
+    </div>
     </header>
 
     <!-- 📦 CONTENIDO -->

@@ -15,6 +15,7 @@ export default function Cart() {
 
     window.addEventListener("cartUpdated", updateCart);
     window.addEventListener("storage", updateCart);
+
     return () => {
       window.removeEventListener("cartUpdated", updateCart);
       window.removeEventListener("storage", updateCart);
@@ -55,7 +56,8 @@ export default function Cart() {
 
                 <span>{item.quantity}</span>
 
-                <button onClick={() => updateQuantity(item.id, 1)}
+                <button
+                  onClick={() => updateQuantity(item.id, 1)}
                   disabled={item.quantity >= 10}
                 >
                   +
@@ -75,6 +77,14 @@ export default function Cart() {
           ))}
 
           <h3>Total: ${formatPrice(total)}</h3>
+
+          {/* ✅ BOTÓN CORRECTAMENTE UBICADO */}
+          <button
+            className="btn-primary"
+            onClick={() => window.location.href = "/checkout"}
+          >
+            Finalizar compra
+          </button>
         </>
       )}
     </div>
