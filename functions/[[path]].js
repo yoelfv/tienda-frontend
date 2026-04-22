@@ -1,3 +1,5 @@
+import { handle } from "../../dist/server/entry.mjs";
+
 export async function onRequest(context) {
-  return context.next();
+  return handle(context.request, context.env, context);
 }
