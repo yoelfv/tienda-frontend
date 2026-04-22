@@ -1,9 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro";
-<meta http-equiv="refresh" content="5;url=/" />
 ---
 
 <Layout title="Pedido enviado">
+  
+  <Fragment slot="head">
+    <meta http-equiv="refresh" content="5;url=/" />
+  </Fragment>
+
   <div class="success-page">
 
     <h1>✅ Pedido enviado correctamente</h1>
