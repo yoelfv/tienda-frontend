@@ -13,10 +13,7 @@ export function getCart() {
 export function saveCart(cart) {
   localStorage.setItem("cart", JSON.stringify(cart));
 
-  // 🔔 Notificar cambios globalmente
-  window.dispatchEvent(new CustomEvent("cartUpdated", {
-    detail: updatedCart
-  }));
+  window.dispatchEvent(new Event("cartUpdated"));
 }
 
 // ➕ Añadir producto
@@ -87,8 +84,8 @@ export function clearCart() {
   notifyCartChange();
 }
 
+// 🔔 Notificar cambios a componentes
 function notifyCartChange() {
    window.dispatchEvent(new Event("cartUpdated"));
-
    window.dispatchEvent(new Event("storage"));
 }
