@@ -1,7 +1,7 @@
 ---
-const { title = "Mi Tienda" } = Astro.props;
 import "../styles/global.css";
 import CartCount from "../components/CartCount.jsx";
+const { title = "Mi Tienda" } = Astro.props;
 ---
 
 <html lang="es">
@@ -16,6 +16,12 @@ import CartCount from "../components/CartCount.jsx";
 
     <title>{title}</title>
     <slot name="head" />
+
+    <style>
+      body {
+              background: red !important;
+            }
+</style>
   </head>
 
   <body>
