@@ -1,11 +1,29 @@
-export default function SafeImage({ src, alt, fallback = "/placeholder.jpg" }) {
-  const [error, setError] = useState(false);
-  
+import { useState } from "react";
+
+export default function SafeImage({
+  src,
+  alt = "Imagen",
+  fallback = "/placeholder.jpg",
+  className = "",
+  ...props
+}) {
+  const [imgSrc, setImgSrc] = useState(src || fallback);
+
+  const handleError = () => {
+    // evitar loop infinito
+    if (imgSrc !== fallback) {
+      setImgSrc(fallback);
+    }
+  };
+
   return (
-    <img 
-      src={error ? fallback : src}
+    <img
+      src={imgSrc}
       alt={alt}
-      onError={() => setError(true)}
+      onError={handleError}
+      className={className}
+      {...props}
+      loading="lazy"
     />
   );
 }

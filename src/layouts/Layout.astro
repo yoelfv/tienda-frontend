@@ -1,5 +1,5 @@
 ---
-const { title } = Astro.props;
+const { title = "Mi Tienda" } = Astro.props;
 import "../styles/global.css";
 import CartCount from "../components/CartCount.jsx";
 ---
@@ -7,15 +7,27 @@ import CartCount from "../components/CartCount.jsx";
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+
+    <!-- 📱 Responsive -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- 🧠 SEO básico -->
+    <meta name="description" content="Tienda online sencilla y rápida" />
+
     <title>{title}</title>
   </head>
+
   <body>
 
     <!-- 🔝 HEADER -->
     <header class="header">
-      <h2>🛒 Mi Tienda</h2>
-      
-      <CartCount client:load />
+      <div class="header-inner">
+        <a href="/" class="logo">🛒 Mi Tienda</a>
+
+        <nav>
+          <CartCount client:load />
+        </nav>
+      </div>
     </header>
 
     <!-- 📦 CONTENIDO -->

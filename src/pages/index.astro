@@ -3,37 +3,44 @@ import Layout from "../layouts/Layout.astro";
 import { getProductos, getStrapiMedia } from "../services/api";
 import AddToCart from "../components/AddToCart.jsx";
 import Cart from "../components/Cart.jsx";
+import SafeImage from "../components/SafeImage.jsx";
 
 const productos: Producto[] = await getProductos();
+
+// 💰 formateo
+const formatPrice = (v) => new Intl.NumberFormat("es-ES").format(v);
 ---
 
 <Layout title="Tienda">
   <h1>Productos</h1>
- <Cart client:load />
- 
+
+  <Cart client:load />
+
+  <!-- 🟢 BOTÓN STICKY -->
   <div class="sticky-checkout">
-    <button
-      class="btn-sticky"
-      onclick="window.location.href='/checkout'"
-    >
+    <a href="/checkout" class="btn-sticky">
       🛒 Finalizar compra ahora
-    </button>
+    </a>
   </div>
 
+  <!-- 🧱 GRID -->
   <div class="productos-grid">
-    {productos.map(p => (
+    {(productos || []).map(p => (
       <div class="card">
-        
-        <img 
-          src={p.imagen?.url ? getStrapiMedia(p.imagen.url) : '/placeholder.jpg'} 
+
+        <SafeImage
+          src={getStrapiMedia(p.imagen?.url)}
+          alt={p.nombre}
+          className="product-img"
         />
 
         <div class="card-body">
           <h3>{p.nombre}</h3>
-          <p class="precio">${p.precio}</p>
+          <p class="precio">${formatPrice(p.precio)}</p>
 
           <AddToCart client:load product={p} />
         </div>
+
       </div>
     ))}
   </div>

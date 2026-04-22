@@ -1,31 +1,36 @@
 import { useEffect, useState } from "react";
-import { getCart, removeFromCart } from "../store/cart";
-import { updateQuantity } from "../store/cart";
+import { getCart, removeFromCart, updateQuantity } from "../store/cart";
 
 export default function Cart() {
   const [cart, setCart] = useState([]);
 
-  useEffect(() => {
-    const updateCart = () => {
-      const storedCart = getCart();
-      setCart(storedCart);
-    };
+  // 🔄 Actualizar carrito
+  const updateCart = () => {
+    const storedCart = getCart();
+    setCart(Array.isArray(storedCart) ? storedCart : []);
+  };
 
+  useEffect(() => {
     updateCart();
 
     window.addEventListener("cartUpdated", updateCart);
-
     return () => {
       window.removeEventListener("cartUpdated", updateCart);
     };
   }, []);
 
+  // 💰 Formatear precio
+  const formatPrice = (value) => {
+    return new Intl.NumberFormat("es-ES").format(value);
+  };
+
+  // 💰 Total
   const total = cart.reduce((sum, item) => {
     return sum + item.precio * item.quantity;
   }, 0);
 
   return (
-    <div style={{ border: "1px solid #ccc", padding: "1rem", marginBottom: "2rem" }}>
+    <div className="cart-container">
       <h2>🛒 Carrito</h2>
 
       {cart.length === 0 ? (
@@ -33,15 +38,11 @@ export default function Cart() {
       ) : (
         <>
           {cart.map(item => (
-            <div
-              key={item.id}
-              style={{
-                borderBottom: "1px solid #eee",
-                marginBottom: "1rem",
-                paddingBottom: "0.5rem"
-              }}
-            >
+            <div key={item.id} className="cart-item">
+
               <p><strong>{item.nombre}</strong></p>
+
+              {/* 🔢 Cantidad */}
               <div className="qty-controls">
                 <button
                   onClick={() => updateQuantity(item.id, -1)}
@@ -49,13 +50,18 @@ export default function Cart() {
                 >
                   −
                 </button>
-  
+
                 <span>{item.quantity}</span>
-  
-                <button onClick={() => updateQuantity(item.id, 1)}>+</button>
+
+                <button onClick={() => updateQuantity(item.id, 1)}
+                  disabled={item.quantity >= 10}
+                >
+                  +
+                </button>
               </div>
-              <p>Precio unitario: ${item.precio}</p>
-              <p>Subtotal: ${item.precio * item.quantity}</p>
+
+              <p>Precio unitario: ${formatPrice(item.precio)}</p>
+              <p>Subtotal: ${formatPrice(item.precio * item.quantity)}</p>
 
               <button
                 className="remove-btn"
@@ -66,7 +72,7 @@ export default function Cart() {
             </div>
           ))}
 
-          <h3>Total: ${total}</h3>
+          <h3>Total: ${formatPrice(total)}</h3>
         </>
       )}
     </div>

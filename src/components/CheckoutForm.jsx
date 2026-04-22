@@ -31,58 +31,77 @@ export default function CheckoutForm() {
     });
   };
 
-  const enviarPedido = async () => {
-    if (!form.nombre_envia || !form.telefono_envia || !form.nombre_recibe || !form.telefono_recibe || !form.direccion) {
-      alert("Por favor completa todos los campos obligatorios");
-      return;
+  const [loading, setLoading] = useState(false);
+
+const enviarPedido = async () => {
+  if (loading) return;
+
+  if (cart.length === 0) {
+    alert("Tu carrito está vacío");
+    return;
+  }
+
+  if (
+    !form.nombre_envia ||
+    !form.telefono_envia ||
+    !form.nombre_recibe ||
+    !form.telefono_recibe ||
+    !form.direccion
+  ) {
+    alert("Por favor completa todos los campos obligatorios");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // 🔧 1. Obtener configuración PRIMERO
+    const config = await getConfiguracion();
+
+    const telefonoDestino = config?.telefono_whatsapp || "0000000000";
+    const mensajeBase = config?.mensaje_base || "Nuevo pedido:";
+    const costoEnvio = config?.costo_envio || 0;
+
+    // 🟣 2. Guardar pedido
+    await crearPedido({
+      ...form,
+      productos: cart,
+      total: total + costoEnvio
+    });
+
+    // 🟢 3. Crear mensaje
+    let mensaje = `${mensajeBase}\n\n`;
+
+    cart.forEach(p => {
+      mensaje += `• ${p.nombre} x${p.quantity} = $${p.precio * p.quantity}\n`;
+    });
+
+    mensaje += `\n💰 Subtotal: $${total}\n`;
+    mensaje += `🚚 Envío: $${costoEnvio}\n`;
+    mensaje += `💵 Total: $${total + costoEnvio}\n\n`;
+
+    if (form.nota) {
+      mensaje += `📝 Nota: ${form.nota}\n`;
     }
 
-    try {
-      // 🟣 Guardar en Strapi
-      await crearPedido({
-        ...form,
-        productos: cart,
-        total
-      });
+    const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
 
-      // 🟢 Crear mensaje WhatsApp
+    window.open(url, "_blank");
 
-      const config = await getConfiguracion();
+    // 🧹 limpiar carrito
+    localStorage.removeItem("cart");
+    window.dispatchEvent(new Event("cartUpdated"));
 
-      const telefonoDestino = config?.telefono_whatsapp || "0000000000";
-      const mensajeBase = config?.mensaje_base || "Nuevo pedido:";
-      //const costoEnvio = config?.costo_envio || 0;
+    // 🔁 redirigir
+    window.location.href = "/pedido-exitoso";
 
-      let mensaje = `${mensajeBase}\n\n`;
-
-      cart.forEach(p => {
-        mensaje += `• ${p.nombre} x${p.quantity} = $${p.precio * p.quantity}\n`;
-      });
-
-      mensaje += `\n💰 Subtotal: $${total}\n`;
-      //mensaje += `🚚 Envío: $${costoEnvio}\n`;
-      mensaje += `💵 Total: $${total + costoEnvio}\n\n`;
-
-      if (form.nota) {
-        mensaje += `📝 Nota: ${form.nota}\n`;
-      }
-
-      const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
-
-      window.open(url, "_blank");
-
-      // 🧹 limpiar carrito
-      localStorage.removeItem("cart");
-      window.dispatchEvent(new Event("cartUpdated"));
-
-      // 🔁 redirigir
-      window.location.href = "/pedido-exitoso";
-
-    } catch (error) {
-      console.error(error);
-      alert("Error al enviar pedido");
-    }
-  };
+  } catch (error) {
+    console.error(error);
+    alert("Error al enviar pedido");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="checkout-container">
@@ -111,22 +130,56 @@ export default function CheckoutForm() {
       <div className="checkout-section">
         <h3>Tus datos</h3>
 
-        <input name="nombre_envia" placeholder="Nombre de quien envía" onChange={handleChange} />
-        <input name="telefono_envia" placeholder="Teléfono  de quien envía" onChange={handleChange} />
+        <input
+          name="nombre_envia"
+          value={form.nombre_envia}
+          onChange={handleChange}
+          placeholder="Nombre de quien envía"
+         />
+        <input
+         name="telefono_envia" 
+         value={form.telefono_envia}
+         onChange={handleChange}
+         placeholder="Teléfono  de quien envía" 
+        />
       </div>
 
       {/* 📦 DATOS ENTREGA */}
       <div className="checkout-section">
         <h3>Datos de entrega</h3>
 
-        <input name="nombre_recibe" placeholder="Nombre y apellidos de quien recibe" onChange={handleChange} />
-        <input name="telefono_recibe" placeholder="Teléfono  de quien recibe" onChange={handleChange} />
-        <input name="direccion" placeholder="Dirección de entrega" onChange={handleChange} />
-        <textarea name="nota" placeholder="Nota adicional (opcional)" onChange={handleChange}></textarea>
+        <input
+         name="nombre_recibe" 
+         value={form.nombre_recibe}
+         onChange={handleChange}
+         placeholder="Nombre y apellidos de quien recibe" 
+        />
+        <input
+         name="telefono_recibe" 
+         value={form.telefono_recibe}
+         onChange={handleChange}
+         placeholder="Teléfono  de quien recibe" 
+        />
+        <input
+         name="direccion" 
+         value={form.direccion}
+         onChange={handleChange}
+         placeholder="Dirección de entrega" 
+        />
+        <textarea
+         name="nota"
+         value={form.nota}
+         onChange={handleChange}
+         placeholder="Nota adicional (opcional)"
+        ></textarea>
       </div>
 
-      <button className="btn-primary" onClick={enviarPedido}>
-        Enviar pedido por WhatsApp
+      <button
+        className="btn-primary"
+        onClick={enviarPedido}
+        disabled={loading}
+      >
+        {loading ? "Enviando..." : "Enviar pedido por WhatsApp"}
       </button>
     </div>
   );

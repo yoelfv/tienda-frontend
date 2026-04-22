@@ -1,10 +1,26 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import PedidosList from "../components/PedidosList.jsx";
+
+const password = Astro.request.headers.get("x-admin");
+
+if (password !== "1234") {
+  return new Response("No autorizado", { status: 401 });
+}
 ---
 
 <Layout title="Panel de pedidos">
-  <h1>📦 Panel de pedidos</h1>
+  <div class="admin-page">
 
-  <PedidosList client:load />
+    <h1>📦 Panel de pedidos</h1>
+
+    <p class="admin-info">
+      Aquí puedes ver todos los pedidos realizados por los clientes.
+    </p>
+
+    <div class="admin-box">
+      <PedidosList client:load />
+    </div>
+
+  </div>
 </Layout>

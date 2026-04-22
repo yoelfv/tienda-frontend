@@ -4,18 +4,23 @@ import { getCart } from "../store/cart";
 export default function CartCount() {
   const [count, setCount] = useState(0);
 
+  const updateCount = () => {
+    const cart = getCart();
+
+    if (!Array.isArray(cart)) {
+      setCount(0);
+      return;
+    }
+
+    const totalItems = cart.reduce(
+      (sum, item) => sum + (item.quantity || 0),
+      0
+    );
+
+    setCount(totalItems);
+  };
+
   useEffect(() => {
-    const updateCount = () => {
-      const cart = getCart();
-
-      const totalItems = cart.reduce(
-        (sum, item) => sum + item.quantity,
-        0
-      );
-
-      setCount(totalItems);
-    };
-
     updateCount();
 
     window.addEventListener("cartUpdated", updateCount);
@@ -26,8 +31,11 @@ export default function CartCount() {
   }, []);
 
   return (
-    <a href="/checkout">
-      🛒 Carrito ({count})
+    <a href="/checkout" className="cart-link">
+      🛒
+      <span className={`cart-badge ${count > 0 ? "active" : ""}`}>
+        {count}
+      </span>
     </a>
   );
 }

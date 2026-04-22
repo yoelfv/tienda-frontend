@@ -1,14 +1,24 @@
 ---
 import Layout from "../layouts/Layout.astro";
+<meta http-equiv="refresh" content="5;url=/" />
 ---
 
 <Layout title="Pedido enviado">
-  <h1>✅ Pedido enviado correctamente</h1>
+  <div class="success-page">
 
-  <p>Tu pedido ha sido enviado por WhatsApp.</p>
-  <p>Pronto nos pondremos en contacto contigo.</p>
+    <h1>✅ Pedido enviado correctamente</h1>
 
-  <a href="/">
-    <button>Volver a la tienda</button>
-  </a>
+    <p class="success-text">
+      Tu pedido ha sido enviado por WhatsApp.
+    </p>
+
+    <p class="success-subtext">
+      Pronto nos pondremos en contacto contigo para confirmar los detalles.
+    </p>
+
+    <a href="/" class="btn-success">
+      ← Volver a la tienda
+    </a>
+
+  </div>
 </Layout>
