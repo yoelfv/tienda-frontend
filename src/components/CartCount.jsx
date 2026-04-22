@@ -24,9 +24,11 @@ export default function CartCount() {
     updateCount();
 
     window.addEventListener("cartUpdated", updateCount);
+    window.addEventListener("storage", updateCount);
 
     return () => {
       window.removeEventListener("cartUpdated", updateCount);
+      window.removeEventListener("storage", updateCount);
     };
   }, []);
 

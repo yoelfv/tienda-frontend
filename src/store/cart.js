@@ -43,6 +43,7 @@ export function addToCart(product) {
   }
 
   saveCart(updatedCart);
+  notifyCartChange();
 }
 
 // ❌ Eliminar producto
@@ -52,6 +53,7 @@ export function removeFromCart(productId) {
   const updatedCart = cart.filter(p => p.id !== productId);
 
   saveCart(updatedCart);
+  notifyCartChange();
 }
 
 // 🔢 Actualizar cantidad
@@ -76,9 +78,17 @@ export function updateQuantity(productId, amount) {
     .filter(Boolean);
 
   saveCart(updatedCart);
+  notifyCartChange();
 }
 
 // 🧹 Vaciar carrito (extra útil)
 export function clearCart() {
   saveCart([]);
+  notifyCartChange();
+}
+
+function notifyCartChange() {
+   window.dispatchEvent(new Event("cartUpdated"));
+
+   window.dispatchEvent(new Event("storage"));
 }

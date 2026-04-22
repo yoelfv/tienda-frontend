@@ -14,8 +14,10 @@ export default function Cart() {
     updateCart();
 
     window.addEventListener("cartUpdated", updateCart);
+    window.addEventListener("storage", updateCart);
     return () => {
       window.removeEventListener("cartUpdated", updateCart);
+      window.removeEventListener("storage", updateCart);
     };
   }, []);
 
