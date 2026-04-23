@@ -74,6 +74,11 @@ h1, h2, h3 {
   background: #3498db;
 }
 
+.btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
 .header {
   background: #2c3e50;
   color: white;
@@ -374,6 +379,26 @@ input, textarea {
 
 .btn-success:hover {
   background: #27ae60;
+}
+
+.descripcion {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 6px 0;
+}
+
+.stock {
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.stock.ok {
+  color: #27ae60;
+}
+
+.stock.no {
+  color: #e74c3c;
 }
 
 /* 📱 MOBILE FIRST AJUSTES */

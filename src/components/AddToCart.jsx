@@ -5,6 +5,9 @@ export default function AddToCart({ product }) {
   const [added, setAdded] = useState(false);
 
   const handleAdd = () => {
+    // 🚫 si no disponible, no hacer nada
+    if (!product?.disponible) return;
+
     if (!product || !product.id) {
       console.warn("Producto inválido:", product);
       return;
@@ -30,8 +33,13 @@ export default function AddToCart({ product }) {
     <button
       className={`btn ${added ? "added" : ""}`}
       onClick={handleAdd}
+      disabled={!product?.disponible}
     >
-      {added ? "✔ Añadido" : "Añadir al carrito"}
+      {!product?.disponible
+        ? "Agotado"
+        : added
+        ? "✔ Añadido"
+        : "Añadir al carrito"}
     </button>
   );
 }

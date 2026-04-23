@@ -1,6 +1,8 @@
 // 🔥 Base centralizada
 const BASE_URL = import.meta.env.STRAPI_URL || "http://localhost:1337";
-const API_URL = `${BASE_URL}/api`;
+const API_URL = import.meta.env.PUBLIC_STRAPI_URL
+  ? `${import.meta.env.PUBLIC_STRAPI_URL}/api`
+  : "http://localhost:1337/api";
 
 // 🖼️ Imágenes
 export function getStrapiMedia(url: string | null | undefined): string {
@@ -48,17 +50,34 @@ export async function getProductos() {
     });
 
     if (!res.ok) {
-      throw new Error(`Error ${res.status}: fallo al obtener productos`);
+      throw new Error("Error en la API");
     }
 
     const data = await res.json();
 
-    return (data.data || []).map((producto: any) => ({
-      ...producto,
-      imagen: producto.imagen?.url
-        ? { url: producto.imagen.url }
-        : null
-    }));
+    return (data.data || []).map(producto => {
+      // 📝 extraer texto de descripción (rich text → string)
+      let descripcionTexto = "";
+
+      if (producto.descripcion && Array.isArray(producto.descripcion)) {
+        descripcionTexto = producto.descripcion
+          .map(block =>
+            block.children?.map(child => child.text).join("")
+          )
+          .join("\n");
+      }
+
+      return {
+        id: producto.id,
+        nombre: producto.nombre,
+        precio: producto.precio,
+        disponible: producto.disponible,
+        descripcion: descripcionTexto,
+        imagen: producto.imagen?.url
+          ? { url: producto.imagen.url }
+          : null
+      };
+    });
 
   } catch (error) {
     console.error("Error cargando productos:", error);

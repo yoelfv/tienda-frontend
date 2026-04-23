@@ -8,13 +8,12 @@ import type { Producto } from "../types/producto";
 
 const productos: Producto[] = await getProductos();
 
-// 💰 formateo
-const formatPrice = (value: number): string => {
-  return new Intl.NumberFormat("es-ES", {
+// 💰 Formato de precio en USD
+const formatPrice = (value) =>
+  new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD"
   }).format(value);
-};
 ---
 
 <Layout title="Tienda">
@@ -30,6 +29,7 @@ const formatPrice = (value: number): string => {
     <div class="productos-grid">
       {productos.map(p => (
         <div class="card">
+
           <SafeImage
             src={getStrapiMedia(p.imagen?.url)}
             alt={p.nombre}
@@ -38,12 +38,25 @@ const formatPrice = (value: number): string => {
 
           <div class="card-body">
             <h3>{p.nombre}</h3>
-            <p class="precio">${formatPrice(p.precio)}</p>
 
+            {/* 💵 Precio */}
+            <p class="precio">{formatPrice(p.precio)}</p>
+
+            {/* 📝 Descripción */}
+            {p.descripcion && (
+              <p class="descripcion">{p.descripcion}</p>
+            )}
+
+            {/* ✅ Disponibilidad */}
+            <p class={`stock ${p.disponible ? "ok" : "no"}`}>
+              {p.disponible ? "Disponible" : "Agotado"}
+            </p>
+
+            {/* 🛒 Botón */}
             <AddToCart client:load product={p} />
           </div>
         </div>
       ))}
-    </div>
+</div>
   </section>
 </Layout>
