@@ -1,7 +1,8 @@
-const STRAPI_URL =
-  import.meta.env.PUBLIC_STRAPI_URL ||
-  import.meta.env.STRAPI_URL ||
-  "http://localhost:1337";
+const STRAPI_URL = import.meta.env.PUBLIC_STRAPI_URL;
+
+if (!STRAPI_URL) {
+  throw new Error("PUBLIC_STRAPI_URL no está definida");
+}
 
 const API_URL = `${STRAPI_URL}/api`;
 
