@@ -5,17 +5,11 @@ import ProductosList from "../components/ProductosList.jsx";
 ---
 
 <Layout title="Tienda">
+  <!-- 🛒 CARRITO FLOTANTE -->
+  <Cart client:load />
 
-  <!-- 🛒 CARRITO -->
-  <section class="cart-section">
-    <Cart client:load />
-  </section>
-
-  <!-- 📦 PRODUCTOS -->
+  <!-- 📦 PRODUCTOS POR CATEGORÍA -->
   <section class="products-section">
-    <h1>Productos</h1>
-
     <ProductosList client:load />
   </section>
-
 </Layout>

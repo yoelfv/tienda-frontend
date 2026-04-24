@@ -60,6 +60,7 @@ export async function getProductos() {
       disponible: producto.disponible,
       descripcion: descripcionTexto,
       imagen: producto.imagen?.url ? { url: producto.imagen.url } : null,
+      categoria: producto.categoria || null,
     };
   });
 }
@@ -92,4 +93,25 @@ export async function getConfiguracion() {
 
   const data = await res.json();
   return data.data || {};
+}
+
+// 🆕 Nueva función para obtener categorías
+export async function getCategorias() {
+  const res = await fetch(`${getApiUrl()}/categorias?populate=*`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("Error API categorías:", res.status, errorText);
+    throw new Error(`Error ${res.status}: fallo al obtener categorías`);
+  }
+
+  const data = await res.json();
+  return (data.data || []).map((cat: any) => ({
+    id: cat.id,
+    nombre: cat.nombre,
+    slug: cat.slug || cat.nombre.toLowerCase().replace(/\s+/g, '-'),
+    imagen: cat.imagen?.url ? { url: cat.imagen.url } : null,
+  }));
 }
