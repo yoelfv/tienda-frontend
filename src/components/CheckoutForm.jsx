@@ -66,23 +66,36 @@ const enviarPedido = async () => {
     await crearPedido({
       ...form,
       productos: cart,
-      total: total + costoEnvio
+      total: total
     });
 
-    // 🟢 3. Crear mensaje
-    let mensaje = `${mensajeBase}\n\n`;
+// 🟢 3. Crear mensaje
+let mensaje = `${mensajeBase}\n\n`;
 
-    cart.forEach(p => {
-      mensaje += `• ${p.nombre} x${p.quantity} = $${p.precio * p.quantity}\n`;
-    });
+// 👤 Datos de quien envía
+mensaje += `👤 DATOS DE QUIEN ENVÍA:\n`;
+mensaje += `📛 Nombre: ${form.nombre_envia}\n`;
+mensaje += `📞 Teléfono: ${form.telefono_envia}\n\n`;
 
-    mensaje += `\n💰 Subtotal: $${total}\n`;
-    mensaje += `🚚 Envío: $${costoEnvio}\n`;
-    mensaje += `💵 Total: $${total + costoEnvio}\n\n`;
+// 📦 Datos de entrega
+mensaje += `📦 DATOS DE ENTREGA:\n`;
+mensaje += `📛 Nombre: ${form.nombre_recibe}\n`;
+mensaje += `📞 Teléfono: ${form.telefono_recibe}\n`;
+mensaje += `📍 Dirección: ${form.direccion}\n\n`;
 
-    if (form.nota) {
-      mensaje += `📝 Nota: ${form.nota}\n`;
-    }
+// 🛒 Productos
+mensaje += `🛒 PRODUCTOS:\n`;
+cart.forEach(p => {
+  mensaje += `• ${p.nombre} x${p.quantity} = $${p.precio * p.quantity}\n`;
+});
+
+// 💰 Totales
+mensaje += `💵 Total: $${total}\n\n`;
+
+// 📝 Nota (si existe)
+if (form.nota) {
+  mensaje += `📝 Nota: ${form.nota}\n`;
+}
 
     const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
 
