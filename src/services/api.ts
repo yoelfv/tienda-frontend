@@ -1,10 +1,15 @@
 // 🔥 Base centralizada
-const BASE_URL =
-  import.meta.env.PUBLIC_STRAPI_URL ||
-  import.meta.env.STRAPI_URL ||
-  "http://localhost:1337";
+const STRAPI_URL = import.meta.env.PUBLIC_STRAPI_URL;
+if (!STRAPI_URL) {
+  throw new Error("PUBLIC_STRAPI_URL no está definida");
+}
+const API_URL = `${STRAPI_URL}/api`;
 
-const API_URL = `${BASE_URL}/api`;
+export function getStrapiMedia(url: string | null | undefined): string {
+  if (!url) return "https://placehold.co/400x400?text=Sin+Imagen";
+  if (url.startsWith("http")) return url;
+  return `${STRAPI_URL}${url}`;
+}
 
 // 🖼️ Imágenes
 export function getStrapiMedia(url: string | null | undefined): string {
