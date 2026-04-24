@@ -1,7 +1,23 @@
 ---
 import "../styles/global.css";
 import CartCount from "../components/CartCount.jsx";
-const { title = "Mi Tienda" } = Astro.props;
+
+// Obtener el nombre de la tienda desde Strapi
+const API_URL = import.meta.env.PUBLIC_API_URL || "https://tienda-backend-production-9f16.up.railway.app";
+
+let nombreTienda = "Mi Tienda";
+
+try {
+  const res = await fetch(`${API_URL}/api/configuracion`);
+  if (res.ok) {
+    const data = await res.json();
+    nombreTienda = data?.data?.nombre_tienda || "Mi Tienda";
+  }
+} catch (error) {
+  console.error("Error al cargar nombre de tienda:", error);
+}
+
+const { title = nombreTienda } = Astro.props;
 ---
 
 <html lang="es">
@@ -14,9 +30,8 @@ const { title = "Mi Tienda" } = Astro.props;
     <!-- 🧠 SEO básico -->
     <meta name="description" content="Tienda online sencilla y rápida" />
 
-    <title>{title}</title>
+    <title>{nombreTienda}</title>
     <slot name="head" />
-    
   </head>
 
   <body>
@@ -24,9 +39,9 @@ const { title = "Mi Tienda" } = Astro.props;
     <!-- 🔝 HEADER -->
     <header class="header">
       <div class="header-inner">
-        <h2>🛒 Mi Tienda</h2>
+        <h2>🛒 {nombreTienda}</h2>
         <CartCount client:load />
-    </div>
+      </div>
     </header>
 
     <!-- 📦 CONTENIDO -->
