@@ -1,22 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { getProductos, getStrapiMedia } from "../services/api";
-import AddToCart from "../components/AddToCart.jsx";
 import Cart from "../components/Cart.jsx";
-import SafeImage from "../components/SafeImage.jsx";
-import type { Producto } from "../types/producto";
-
-const productos: Producto[] = await getProductos();
-
-// 💰 Formato de precio en USD
-const formatPrice = (value) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD"
-  }).format(value);
+import ProductosList from "../components/ProductosList.jsx";
 ---
 
 <Layout title="Tienda">
+
   <!-- 🛒 CARRITO -->
   <section class="cart-section">
     <Cart client:load />
@@ -26,37 +15,7 @@ const formatPrice = (value) =>
   <section class="products-section">
     <h1>Productos</h1>
 
-    <div class="productos-grid">
-      {productos.map(p => (
-        <div class="card">
-
-          <SafeImage
-            src={getStrapiMedia(p.imagen?.url)}
-            alt={p.nombre}
-            className="product-img"
-          />
-
-          <div class="card-body">
-            <h3>{p.nombre}</h3>
-
-            {/* 💵 Precio */}
-            <p class="precio">{formatPrice(p.precio)}</p>
-
-            {/* 📝 Descripción */}
-            {p.descripcion && (
-              <p class="descripcion">{p.descripcion}</p>
-            )}
-
-            {/* ✅ Disponibilidad */}
-            <p class={`stock ${p.disponible ? "ok" : "no"}`}>
-              {p.disponible ? "Disponible" : "Agotado"}
-            </p>
-
-            {/* 🛒 Botón */}
-            <AddToCart client:load product={p} />
-          </div>
-        </div>
-      ))}
-</div>
+    <ProductosList client:load />
   </section>
+
 </Layout>

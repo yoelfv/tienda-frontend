@@ -1,8 +1,10 @@
 // 🔥 Base centralizada
-const BASE_URL = import.meta.env.STRAPI_URL || "http://localhost:1337";
-const API_URL = import.meta.env.PUBLIC_STRAPI_URL
-  ? `${import.meta.env.PUBLIC_STRAPI_URL}/api`
-  : "http://localhost:1337/api";
+const BASE_URL =
+  import.meta.env.PUBLIC_STRAPI_URL ||
+  import.meta.env.STRAPI_URL ||
+  "http://localhost:1337";
+
+const API_URL = `${BASE_URL}/api`;
 
 // 🖼️ Imágenes
 export function getStrapiMedia(url: string | null | undefined): string {
