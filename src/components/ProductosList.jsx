@@ -19,20 +19,20 @@ export default function ProductosList() {
       .finally(() => setLoading(false));
   }, []);
 
-  const productosFiltrados = categoriaActiva === "todas"
-    ? productos
-    : productos.filter(p => {
-        // Ajusta según la estructura real de tu categoría en el producto
-        if (typeof p.categoria === 'object' && p.categoria?.slug) {
-          return p.categoria.slug === categoriaActiva;
-        }
-        return false;
-      });
+  const productosFiltrados =
+    categoriaActiva === "todas"
+      ? productos
+      : productos.filter((p) => {
+          if (typeof p.categoria === "object" && p.categoria?.slug) {
+            return p.categoria.slug === categoriaActiva;
+          }
+          return false;
+        });
 
   const formatPrice = (value) =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD"
+      currency: "USD",
     }).format(value);
 
   if (loading) {
@@ -41,61 +41,55 @@ export default function ProductosList() {
 
   return (
     <div className="store-content">
-      {/* 🖼️ TARJETAS DE CATEGORÍAS CON IMAGEN */}
-      <div className="categorias-grid">
-        {categorias.map(cat => (
-          <div
+      {/* 🎠 BARRA HORIZONTAL DESLIZABLE */}
+      <div className="categorias-scroll">
+        <button
+          className={`cat-chip ${categoriaActiva === "todas" ? "active" : ""}`}
+          onClick={() => setCategoriaActiva("todas")}
+        >
+          🏪 Todo
+        </button>
+        {categorias.map((cat) => (
+          <button
             key={cat.id}
-            className={`categoria-card ${categoriaActiva === cat.slug ? "active" : ""}`}
+            className={`cat-chip ${categoriaActiva === cat.slug ? "active" : ""}`}
             onClick={() => setCategoriaActiva(cat.slug)}
           >
-            <SafeImage
-              src={getStrapiMedia(cat.imagen?.url)}
-              alt={cat.nombre}
-              className="categoria-img"
-            />
-          </div>
+            {cat.imagen?.url ? (
+              <img
+                src={getStrapiMedia(cat.imagen.url)}
+                alt={cat.nombre}
+                className="cat-chip-img"
+              />
+            ) : (
+              <span className="cat-chip-icon">📦</span>
+            )}
+            {cat.nombre}
+          </button>
         ))}
       </div>
 
-      {/* 🔙 Botón para ver todas */}
-      {categoriaActiva !== "todas" && (
-        <div className="back-to-all">
-          <button
-            className="tab-btn active"
-            onClick={() => setCategoriaActiva("todas")}
-          >
-            ← Ver todos los productos
-          </button>
-        </div>
-      )}
-
-      {/* 📦 PRODUCTOS FILTRADOS */}
+      {/* 📦 PRODUCTOS */}
       <div className="productos-grid">
         {productosFiltrados.length === 0 ? (
           <p className="no-products">No hay productos en esta categoría</p>
         ) : (
-          productosFiltrados.map(p => (
+          productosFiltrados.map((p) => (
             <div className="card" key={p.id}>
               <SafeImage
                 src={getStrapiMedia(p.imagen?.url)}
                 alt={p.nombre}
                 className="product-img"
               />
-
               <div className="card-body">
                 <h3>{p.nombre}</h3>
-
                 <p className="precio">{formatPrice(p.precio)}</p>
-
                 {p.descripcion && (
                   <p className="descripcion">{p.descripcion}</p>
                 )}
-
                 <p className={`stock ${p.disponible ? "ok" : "no"}`}>
                   {p.disponible ? "Disponible" : "Agotado"}
                 </p>
-
                 <AddToCart product={p} />
               </div>
             </div>

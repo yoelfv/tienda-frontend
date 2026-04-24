@@ -777,3 +777,81 @@ input, textarea {
     gap: 0.5rem;
   }
 }
+
+/* ========== BARRA HORIZONTAL DE CATEGORÍAS ========== */
+
+.categorias-scroll {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.8rem 0;
+  margin-bottom: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  position: sticky;
+  top: 60px;
+  background: white;
+  z-index: 100;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.categorias-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.cat-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 25px;
+  background: white;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.cat-chip:hover {
+  background: #f8f8f8;
+}
+
+.cat-chip.active {
+  background: #2c3e50;
+  color: white;
+  border-color: #2c3e50;
+}
+
+.cat-chip-img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.cat-chip-icon {
+  font-size: 1rem;
+}
+
+/* ========== RESPONSIVE ========== */
+
+@media (max-width: 600px) {
+  .categorias-scroll {
+    top: 50px;
+    padding: 0.6rem 0;
+  }
+
+  .cat-chip {
+    padding: 0.45rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .cat-chip-img {
+    width: 20px;
+    height: 20px;
+  }
+}
