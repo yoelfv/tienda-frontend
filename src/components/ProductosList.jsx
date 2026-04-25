@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react";
-import { getProductos, getCategorias, getStrapiMedia } from "../services/api";
+import { getProductos, getStrapiMedia } from "../services/api";
 import AddToCart from "./AddToCart";
 import SafeImage from "./SafeImage";
-import CategoriasBar from "./CategoriasBar";
+import CategoriasBarWrapper from "./CategoriasBarWrapper";
 
 export default function ProductosList() {
   const [productos, setProductos] = useState([]);
-  const [categorias, setCategorias] = useState([]);
   const [categoriaActiva, setCategoriaActiva] = useState("todas");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([getProductos(), getCategorias()])
-      .then(([prods, cats]) => {
-        setProductos(prods);
-        setCategorias(cats);
-      })
+    getProductos()
+      .then(setProductos)
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -42,13 +38,6 @@ export default function ProductosList() {
 
   return (
     <div className="store-content">
-      {/* 🎠 BARRA HORIZONTAL CON SCROLL MEJORADO */}
-      <CategoriasBar
-        categorias={categorias}
-        categoriaActiva={categoriaActiva}
-        onSelect={setCategoriaActiva}
-      />
-
       {/* 📦 PRODUCTOS */}
       <div className="productos-grid">
         {productosFiltrados.length === 0 ? (

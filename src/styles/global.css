@@ -826,16 +826,6 @@ input, textarea {
 
 /* ========== BARRA DE CATEGORÍAS ========== */
 
-.categorias-barra {
-  background: white;
-  border-bottom: 1px solid #e0e0e0;
-  height: 55px;
-  display: flex;
-  align-items: center;
-  padding: 0 1rem;
-  box-sizing: border-box;
-}
-
 .categorias-scroll {
   display: flex;
   gap: 0.5rem;
@@ -896,14 +886,7 @@ input, textarea {
   font-size: 1rem;
 }
 
-/* ========== RESPONSIVE ========== */
-
 @media (max-width: 600px) {
-  .categorias-barra {
-    height: 50px;
-    padding: 0 0.8rem;
-  }
-
   .cat-chip {
     height: 34px;
     padding: 0 0.8rem;

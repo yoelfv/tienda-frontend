@@ -3,7 +3,6 @@ import { getStrapiMedia } from "../services/api";
 
 export default function CategoriasBar({ categorias, categoriaActiva, onSelect }) {
   const scrollRef = useRef(null);
-  const containerRef = useRef(null);
 
   // 🖱️ Scroll horizontal con rueda del mouse
   useEffect(() => {
@@ -20,42 +19,32 @@ export default function CategoriasBar({ categorias, categoriaActiva, onSelect })
     return () => el.removeEventListener("wheel", handleWheel);
   }, []);
 
-  // 📍 Mover la barra dentro del contenedor top-bar
-  useEffect(() => {
-    const topBar = document.querySelector('.top-bar');
-    if (topBar && containerRef.current && !topBar.contains(containerRef.current)) {
-      topBar.appendChild(containerRef.current);
-    }
-  }, []);
-
   return (
-    <div ref={containerRef} className="categorias-barra">
-      <div className="categorias-scroll" ref={scrollRef}>
+    <div className="categorias-scroll" ref={scrollRef}>
+      <button
+        className={`cat-chip ${categoriaActiva === "todas" ? "active" : ""}`}
+        onClick={() => onSelect("todas")}
+      >
+        🏪 Todo
+      </button>
+      {categorias.map((cat) => (
         <button
-          className={`cat-chip ${categoriaActiva === "todas" ? "active" : ""}`}
-          onClick={() => onSelect("todas")}
+          key={cat.id}
+          className={`cat-chip ${categoriaActiva === cat.slug ? "active" : ""}`}
+          onClick={() => onSelect(cat.slug)}
         >
-          🏪 Todo
+          {cat.imagen?.url ? (
+            <img
+              src={getStrapiMedia(cat.imagen.url)}
+              alt={cat.nombre}
+              className="cat-chip-img"
+            />
+          ) : (
+            <span className="cat-chip-icon">📦</span>
+          )}
+          {cat.nombre}
         </button>
-        {categorias.map((cat) => (
-          <button
-            key={cat.id}
-            className={`cat-chip ${categoriaActiva === cat.slug ? "active" : ""}`}
-            onClick={() => onSelect(cat.slug)}
-          >
-            {cat.imagen?.url ? (
-              <img
-                src={getStrapiMedia(cat.imagen.url)}
-                alt={cat.nombre}
-                className="cat-chip-img"
-              />
-            ) : (
-              <span className="cat-chip-icon">📦</span>
-            )}
-            {cat.nombre}
-          </button>
-        ))}
-      </div>
+      ))}
     </div>
   );
 }

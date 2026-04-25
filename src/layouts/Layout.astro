@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import CartCount from "../components/CartCount.jsx";
 
 const API_URL = import.meta.env.PUBLIC_API_URL || "https://tienda-backend-production-9f16.up.railway.app";
 
@@ -28,17 +29,14 @@ const { title = nombreTienda } = Astro.props;
   </head>
 
   <body>
-    <!-- 🔝 HEADER + BARRA (contenedor sticky unificado) -->
-    <div class="top-bar">
-      <header class="header">
-        <div class="header-inner">
-          <a href="/" class="logo-link">
-            <h2>🛒 {nombreTienda}</h2>
-          </a>
-        </div>
-      </header>
-      <!-- La barra de categorías se inserta desde el componente -->
-    </div>
+    <!-- 🔝 HEADER FIJO -->
+    <header class="header">
+      <div class="header-inner">
+        <a href="/" class="logo-link">
+          <h2>🛒 {nombreTienda}</h2>
+        </a>
+      </div>
+    </header>
 
     <!-- 📦 CONTENIDO PRINCIPAL -->
     <main class="container">
