@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getProductos, getCategorias, getStrapiMedia } from "../services/api";
 import AddToCart from "./AddToCart";
 import SafeImage from "./SafeImage";
+import CategoriasBar from "./CategoriasBar";
 
 export default function ProductosList() {
   const [productos, setProductos] = useState([]);
@@ -41,33 +42,12 @@ export default function ProductosList() {
 
   return (
     <div className="store-content">
-      {/* 🎠 BARRA HORIZONTAL DESLIZABLE */}
-      <div className="categorias-scroll">
-        <button
-          className={`cat-chip ${categoriaActiva === "todas" ? "active" : ""}`}
-          onClick={() => setCategoriaActiva("todas")}
-        >
-          🏪 Todo
-        </button>
-        {categorias.map((cat) => (
-          <button
-            key={cat.id}
-            className={`cat-chip ${categoriaActiva === cat.slug ? "active" : ""}`}
-            onClick={() => setCategoriaActiva(cat.slug)}
-          >
-            {cat.imagen?.url ? (
-              <img
-                src={getStrapiMedia(cat.imagen.url)}
-                alt={cat.nombre}
-                className="cat-chip-img"
-              />
-            ) : (
-              <span className="cat-chip-icon">📦</span>
-            )}
-            {cat.nombre}
-          </button>
-        ))}
-      </div>
+      {/* 🎠 BARRA HORIZONTAL CON SCROLL MEJORADO */}
+      <CategoriasBar
+        categorias={categorias}
+        categoriaActiva={categoriaActiva}
+        onSelect={setCategoriaActiva}
+      />
 
       {/* 📦 PRODUCTOS */}
       <div className="productos-grid">
