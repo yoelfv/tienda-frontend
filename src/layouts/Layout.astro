@@ -7,23 +7,37 @@ let nombreTienda: string = "Mi Tienda";
 let logoUrl: string | null = null;
 let imagenesCategorias: string[] = [];
 
+function extraerUrlImagen(imagen: any): string | null {
+  if (!imagen) return null;
+  if (typeof imagen === 'string') return imagen;
+  if (imagen.url) return imagen.url;
+  if (imagen.data?.attributes?.url) return imagen.data.attributes.url;
+  return null;
+}
+
 try {
   const [resConfig, resCategorias] = await Promise.all([
-    fetch(`${API_URL}/api/configuracion`),
+    // 🆕 Agregado ?populate=* para obtener el logo
+    fetch(`${API_URL}/api/configuracion?populate=*`),
     fetch(`${API_URL}/api/categorias?populate=*`)
   ]);
 
   if (resConfig.ok) {
-    const data = await resConfig.json();
-    nombreTienda = data?.data?.nombre_tienda || "Mi Tienda";
-    logoUrl = data?.data?.logo?.url || null;
+    const configData = await resConfig.json();
+    const config = configData?.data || configData || {};
+    nombreTienda = config.nombre_tienda || "Mi Tienda";
+    logoUrl = extraerUrlImagen(config.logo);
   }
 
   if (resCategorias.ok) {
-    const data = await resCategorias.json();
-    imagenesCategorias = (data.data || [])
-      .map((cat: any) => cat.imagen?.url || cat.imagen?.data?.attributes?.url)
-      .filter((url: unknown): url is string => typeof url === 'string');
+    const catData = await resCategorias.json();
+    const categorias = catData?.data || [];
+
+    if (Array.isArray(categorias)) {
+      imagenesCategorias = categorias
+        .map((cat: any) => extraerUrlImagen(cat.imagen))
+        .filter((url: unknown): url is string => typeof url === 'string');
+    }
   }
 } catch (error) {
   console.error("Error al cargar datos del header:", error);
@@ -42,9 +56,7 @@ const { title = nombreTienda } = Astro.props;
   </head>
 
   <body>
-    <!-- 🔝 HEADER REDISEÑADO -->
     <header class="header" id="main-header">
-      <!-- 🖼️ Collage de fondo -->
       <div class="header-bg">
         {imagenesCategorias.length > 0
           ? imagenesCategorias.map((url: string) => (
@@ -57,7 +69,6 @@ const { title = nombreTienda } = Astro.props;
       </div>
 
       <div class="header-inner">
-        <!-- 🏪 Logo + Nombre (clickeable para info) -->
         <div class="header-left" id="btn-info-tienda">
           {logoUrl ? (
             <img
@@ -79,37 +90,26 @@ const { title = nombreTienda } = Astro.props;
           </div>
         </div>
 
-        <!-- 📦 Quiénes Somos + Carrito -->
         <div class="header-right">
           <button class="btn-quienes-somos" id="btn-quienes-somos">
             📖 Quiénes Somos
           </button>
           <button class="btn-cart-header" id="btn-cart-header">
             🛒
-            <span
-              class="cart-badge-header"
-              id="cart-badge-header"
-              style="display:none"
-            >
-              0
-            </span>
+            <span class="cart-badge-header" id="cart-badge-header" style="display:none">0</span>
           </button>
         </div>
       </div>
     </header>
 
-    <!-- 📖 MODAL QUIÉNES SOMOS -->
     <div class="modal-overlay" id="modal-quienes-somos" style="display:none">
       <div class="modal-content">
         <button class="modal-close" id="modal-close">✕</button>
         <h3 class="modal-title" id="modal-title">Quiénes Somos</h3>
-        <div class="modal-body" id="modal-body">
-          Cargando...
-        </div>
+        <div class="modal-body" id="modal-body">Cargando...</div>
       </div>
     </div>
 
-    <!-- 📦 CONTENIDO PRINCIPAL -->
     <main class="container">
       <slot />
     </main>
@@ -126,14 +126,35 @@ const { title = nombreTienda } = Astro.props;
     email: string;
   }
 
+  function richTextToPlainText(blocks: any[]): string {
+    if (!blocks || !Array.isArray(blocks)) return 'Información no disponible.';
+    return blocks
+      .map((block: any) => {
+        if (block.children && Array.isArray(block.children)) {
+          return block.children.map((child: any) => child.text || '').join('');
+        }
+        return '';
+      })
+      .filter((text: string) => text.trim() !== '')
+      .join('\n');
+  }
+
   async function cargarInfoTienda(): Promise<InfoTienda | null> {
     try {
-      const res = await fetch(`${API_URL}/api/configuracion`);
+      const res = await fetch(`${API_URL}/api/configuracion?populate=*`);
       if (res.ok) {
         const data = await res.json();
         const config = data?.data || {};
+        let descripcion = 'Información no disponible.';
+        if (config.descripcion_tienda) {
+          if (typeof config.descripcion_tienda === 'string') {
+            descripcion = config.descripcion_tienda;
+          } else if (Array.isArray(config.descripcion_tienda)) {
+            descripcion = richTextToPlainText(config.descripcion_tienda);
+          }
+        }
         return {
-          descripcion: config.descripcion_tienda || config.quienes_somos || 'Información no disponible.',
+          descripcion,
           direccion: config.direccion || 'No especificada',
           telefono: config.telefono || config.telefono_whatsapp || 'No especificado',
           email: config.email || 'No especificado',
@@ -149,13 +170,12 @@ const { title = nombreTienda } = Astro.props;
     const modal = document.getElementById('modal-quienes-somos');
     const body = document.getElementById('modal-body');
     const title = document.getElementById('modal-title');
-
     if (!modal || !body || !title) return;
-
     if (info) {
       title.textContent = 'Quiénes Somos';
+      const descripcionHTML = info.descripcion.replace(/\n/g, '<br>');
       body.innerHTML = `
-        <p>${info.descripcion}</p>
+        <p>${descripcionHTML}</p>
         <div class="modal-contacto">
           <p><strong>📍 Dirección:</strong> ${info.direccion}</p>
           <p><strong>📞 Teléfono:</strong> ${info.telefono}</p>
@@ -171,49 +191,28 @@ const { title = nombreTienda } = Astro.props;
 
   function cerrarModal(): void {
     const modal = document.getElementById('modal-quienes-somos');
-    if (modal) {
-      modal.style.display = 'none';
-    }
+    if (modal) modal.style.display = 'none';
     document.body.style.overflow = '';
   }
 
-  const btnQuienesSomos = document.getElementById('btn-quienes-somos');
-  const btnInfoTienda = document.getElementById('btn-info-tienda');
-  const modalClose = document.getElementById('modal-close');
-  const modalOverlay = document.getElementById('modal-quienes-somos');
-  const btnCartHeader = document.getElementById('btn-cart-header');
+  document.getElementById('btn-quienes-somos')?.addEventListener('click', async () => {
+    abrirModal(await cargarInfoTienda());
+  });
 
-  if (btnQuienesSomos) {
-    btnQuienesSomos.addEventListener('click', async () => {
-      const info = await cargarInfoTienda();
-      abrirModal(info);
-    });
-  }
+  document.getElementById('btn-info-tienda')?.addEventListener('click', async () => {
+    abrirModal(await cargarInfoTienda());
+  });
 
-  if (btnInfoTienda) {
-    btnInfoTienda.addEventListener('click', async () => {
-      const info = await cargarInfoTienda();
-      abrirModal(info);
-    });
-  }
+  document.getElementById('modal-close')?.addEventListener('click', cerrarModal);
 
-  if (modalClose) {
-    modalClose.addEventListener('click', cerrarModal);
-  }
-
-  if (modalOverlay) {
-    modalOverlay.addEventListener('click', (e) => {
-      if (e.target === e.currentTarget) cerrarModal();
-    });
-  }
+  document.getElementById('modal-quienes-somos')?.addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) cerrarModal();
+  });
 
   function actualizarBadge(): void {
     const cartData = localStorage.getItem('cart');
     const cart = cartData ? JSON.parse(cartData) : [];
-    const total: number = cart.reduce(
-      (sum: number, item: { quantity?: number }) => sum + (item.quantity || 1),
-      0
-    );
+    const total: number = cart.reduce((sum: number, item: { quantity?: number }) => sum + (item.quantity || 1), 0);
     const badge = document.getElementById('cart-badge-header');
     if (!badge) return;
     if (total > 0) {
@@ -224,14 +223,10 @@ const { title = nombreTienda } = Astro.props;
     }
   }
 
-  if (btnCartHeader) {
-    btnCartHeader.addEventListener('click', () => {
-      const fab = document.querySelector('.cart-fab');
-      if (fab && fab instanceof HTMLElement) {
-        fab.click();
-      }
-    });
-  }
+  document.getElementById('btn-cart-header')?.addEventListener('click', () => {
+    const fab = document.querySelector('.cart-fab');
+    if (fab && fab instanceof HTMLElement) fab.click();
+  });
 
   actualizarBadge();
   window.addEventListener('cartUpdated', actualizarBadge);
