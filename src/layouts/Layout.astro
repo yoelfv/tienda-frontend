@@ -1,19 +1,32 @@
 ---
 import "../styles/global.css";
-import CartCount from "../components/CartCount.jsx";
 
 const API_URL = import.meta.env.PUBLIC_API_URL || "https://tienda-backend-production-9f16.up.railway.app";
 
 let nombreTienda = "Mi Tienda";
+let logoUrl = null;
+let imagenesCategorias = [];
 
 try {
-  const res = await fetch(`${API_URL}/api/configuracion`);
-  if (res.ok) {
-    const data = await res.json();
+  const [resConfig, resCategorias] = await Promise.all([
+    fetch(`${API_URL}/api/configuracion`),
+    fetch(`${API_URL}/api/categorias?populate=*`)
+  ]);
+
+  if (resConfig.ok) {
+    const data = await resConfig.json();
     nombreTienda = data?.data?.nombre_tienda || "Mi Tienda";
+    logoUrl = data?.data?.logo?.url || null;
+  }
+
+  if (resCategorias.ok) {
+    const data = await resCategorias.json();
+    imagenesCategorias = (data.data || [])
+      .map(cat => cat.imagen?.url || cat.imagen?.data?.attributes?.url)
+      .filter(Boolean);
   }
 } catch (error) {
-  console.error("Error al cargar nombre de tienda:", error);
+  console.error("Error al cargar datos del header:", error);
 }
 
 const { title = nombreTienda } = Astro.props;
@@ -29,14 +42,60 @@ const { title = nombreTienda } = Astro.props;
   </head>
 
   <body>
-    <!-- 🔝 HEADER FIJO -->
-    <header class="header">
+    <!-- 🔝 HEADER REDISEÑADO -->
+    <header class="header" id="main-header">
+      <!-- 🖼️ Collage de fondo -->
+      <div class="header-bg">
+        {imagenesCategorias.length > 0 ? (
+          imagenesCategorias.map((url, i) => (
+            <img src={url.startsWith('http') ? url : `${API_URL}${url}`} alt="" key={i} />
+          ))
+        ) : (
+          <div></div>
+        )}
+      </div>
+
       <div class="header-inner">
-        <a href="/" class="logo-link">
-          <h2>🛒 {nombreTienda}</h2>
-        </a>
+        <!-- 🏪 Logo + Nombre (clickeable para info) -->
+        <div class="header-left" id="btn-info-tienda">
+          {logoUrl ? (
+            <img
+              src={logoUrl.startsWith('http') ? logoUrl : `${API_URL}${logoUrl}`}
+              alt={nombreTienda}
+              class="header-logo"
+            />
+          ) : (
+            <div class="header-logo" style="background:#2ecc71;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🛒</div>
+          )}
+          <div class="header-info">
+            <h2 class="header-name">{nombreTienda}</h2>
+            <p class="header-tagline">Tu tienda de confianza</p>
+          </div>
+        </div>
+
+        <!-- 📦 Quiénes Somos + Carrito -->
+        <div class="header-right">
+          <button class="btn-quienes-somos" id="btn-quienes-somos">
+            📖 Quiénes Somos
+          </button>
+          <button class="btn-cart-header" id="btn-cart-header">
+            🛒
+            <span class="cart-badge-header" id="cart-badge-header" style="display:none">0</span>
+          </button>
+        </div>
       </div>
     </header>
+
+    <!-- 📖 MODAL QUIÉNES SOMOS -->
+    <div class="modal-overlay" id="modal-quienes-somos" style="display:none">
+      <div class="modal-content">
+        <button class="modal-close" id="modal-close">✕</button>
+        <h3 class="modal-title" id="modal-title">Quiénes Somos</h3>
+        <div class="modal-body" id="modal-body">
+          Cargando...
+        </div>
+      </div>
+    </div>
 
     <!-- 📦 CONTENIDO PRINCIPAL -->
     <main class="container">
@@ -44,3 +103,96 @@ const { title = nombreTienda } = Astro.props;
     </main>
   </body>
 </html>
+
+<script>
+  // 📖 Cargar y mostrar modal de información
+  const API_URL = import.meta.env.PUBLIC_API_URL || "https://tienda-backend-production-9f16.up.railway.app";
+
+  async function cargarInfoTienda() {
+    try {
+      const res = await fetch(`${API_URL}/api/configuracion`);
+      if (res.ok) {
+        const data = await res.json();
+        const config = data?.data || {};
+        return {
+          descripcion: config.descripcion_tienda || config.quienes_somos || 'Información no disponible.',
+          direccion: config.direccion || 'No especificada',
+          telefono: config.telefono || config.telefono_whatsapp || 'No especificado',
+          email: config.email || 'No especificado',
+        };
+      }
+    } catch (e) {
+      console.error('Error cargando info:', e);
+    }
+    return null;
+  }
+
+  // Abrir modal
+  function abrirModal(info) {
+    const modal = document.getElementById('modal-quienes-somos');
+    const body = document.getElementById('modal-body');
+    const title = document.getElementById('modal-title');
+
+    if (info) {
+      title.textContent = 'Quiénes Somos';
+      body.innerHTML = `
+        <p>${info.descripcion}</p>
+        <div class="modal-contacto">
+          <p><strong>📍 Dirección:</strong> ${info.direccion}</p>
+          <p><strong>📞 Teléfono:</strong> ${info.telefono}</p>
+          <p><strong>✉️ Email:</strong> ${info.email}</p>
+        </div>
+      `;
+    } else {
+      body.textContent = 'No se pudo cargar la información.';
+    }
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Cerrar modal
+  function cerrarModal() {
+    document.getElementById('modal-quienes-somos').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  // Eventos
+  document.getElementById('btn-quienes-somos').addEventListener('click', async () => {
+    const info = await cargarInfoTienda();
+    abrirModal(info);
+  });
+
+  document.getElementById('btn-info-tienda').addEventListener('click', async () => {
+    const info = await cargarInfoTienda();
+    abrirModal(info);
+  });
+
+  document.getElementById('modal-close').addEventListener('click', cerrarModal);
+
+  document.getElementById('modal-quienes-somos').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) cerrarModal();
+  });
+
+  // 🛒 Sincronizar badge del carrito
+  function actualizarBadge() {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const total = cart.reduce((s, i) => s + (i.quantity || 1), 0);
+    const badge = document.getElementById('cart-badge-header');
+    if (total > 0) {
+      badge.textContent = total;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  document.getElementById('btn-cart-header').addEventListener('click', () => {
+    // Busca el botón flotante del carrito y lo activa
+    const fab = document.querySelector('.cart-fab');
+    if (fab) fab.click();
+  });
+
+  actualizarBadge();
+  window.addEventListener('cartUpdated', actualizarBadge);
+  window.addEventListener('storage', actualizarBadge);
+</script>
