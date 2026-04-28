@@ -785,3 +785,51 @@ input, textarea {
     font-size: 1.1rem;
   }
 }
+
+/* ========== HEADER BACKGROUND CARRUSEL ========== */
+
+.header {
+  position: relative;
+  overflow: hidden;
+}
+
+.header-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.12;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.header-bg-track {
+  display: flex;
+  gap: 1rem;
+  animation: scroll-header-bg 40s linear infinite;
+  width: max-content;
+}
+
+.header-bg img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 50%;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+@keyframes scroll-header-bg {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.header-inner {
+  position: relative;
+  z-index: 1;
+}

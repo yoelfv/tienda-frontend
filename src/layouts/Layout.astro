@@ -17,7 +17,6 @@ function extraerUrlImagen(imagen: any): string | null {
 
 try {
   const [resConfig, resCategorias] = await Promise.all([
-    // 🆕 Agregado ?populate=* para obtener el logo
     fetch(`${API_URL}/api/configuracion?populate=*`),
     fetch(`${API_URL}/api/categorias?populate=*`)
   ]);
@@ -44,6 +43,9 @@ try {
 }
 
 const { title = nombreTienda } = Astro.props;
+
+// Duplicar imágenes para el carrusel infinito
+const imagenesDuplicadas = [...imagenesCategorias, ...imagenesCategorias];
 ---
 
 <html lang="es">
@@ -57,16 +59,20 @@ const { title = nombreTienda } = Astro.props;
 
   <body>
     <header class="header" id="main-header">
-      <div class="header-bg">
-        {imagenesCategorias.length > 0
-          ? imagenesCategorias.map((url: string) => (
+      <!-- 🎠 CARRUSEL DE FONDO -->
+      {imagenesCategorias.length > 0 ? (
+        <div class="header-bg">
+          <div class="header-bg-track">
+            {imagenesDuplicadas.map((url: string) => (
               <img
                 src={url.startsWith('http') ? url : `${API_URL}${url}`}
                 alt=""
+                loading="lazy"
               />
-            ))
-          : null}
-      </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       <div class="header-inner">
         <div class="header-left" id="btn-info-tienda">
@@ -94,14 +100,11 @@ const { title = nombreTienda } = Astro.props;
           <button class="btn-quienes-somos" id="btn-quienes-somos">
             📖 Quiénes Somos
           </button>
-          <button class="btn-cart-header" id="btn-cart-header">
-            🛒
-            <span class="cart-badge-header" id="cart-badge-header" style="display:none">0</span>
-          </button>
         </div>
       </div>
     </header>
 
+    <!-- 📖 MODAL QUIÉNES SOMOS -->
     <div class="modal-overlay" id="modal-quienes-somos" style="display:none">
       <div class="modal-content">
         <button class="modal-close" id="modal-close">✕</button>
@@ -110,6 +113,7 @@ const { title = nombreTienda } = Astro.props;
       </div>
     </div>
 
+    <!-- 📦 CONTENIDO PRINCIPAL -->
     <main class="container">
       <slot />
     </main>
@@ -208,27 +212,4 @@ const { title = nombreTienda } = Astro.props;
   document.getElementById('modal-quienes-somos')?.addEventListener('click', (e) => {
     if (e.target === e.currentTarget) cerrarModal();
   });
-
-  function actualizarBadge(): void {
-    const cartData = localStorage.getItem('cart');
-    const cart = cartData ? JSON.parse(cartData) : [];
-    const total: number = cart.reduce((sum: number, item: { quantity?: number }) => sum + (item.quantity || 1), 0);
-    const badge = document.getElementById('cart-badge-header');
-    if (!badge) return;
-    if (total > 0) {
-      badge.textContent = String(total);
-      badge.style.display = 'flex';
-    } else {
-      badge.style.display = 'none';
-    }
-  }
-
-  document.getElementById('btn-cart-header')?.addEventListener('click', () => {
-    const fab = document.querySelector('.cart-fab');
-    if (fab && fab instanceof HTMLElement) fab.click();
-  });
-
-  actualizarBadge();
-  window.addEventListener('cartUpdated', actualizarBadge);
-  window.addEventListener('storage', actualizarBadge);
 </script>
