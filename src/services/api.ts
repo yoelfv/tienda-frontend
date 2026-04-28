@@ -95,7 +95,6 @@ export async function getConfiguracion() {
   return data.data || {};
 }
 
-// 🆕 Nueva función para obtener categorías
 export async function getCategorias() {
   const res = await fetch(`${getApiUrl()}/categorias?populate=*`, {
     cache: "no-store",
@@ -107,11 +106,30 @@ export async function getCategorias() {
     throw new Error(`Error ${res.status}: fallo al obtener categorías`);
   }
 
-  const data = await res.json();
-  return (data.data || []).map((cat: any) => ({
-    id: cat.id,
-    nombre: cat.nombre,
-    slug: cat.slug || cat.nombre.toLowerCase().replace(/\s+/g, '-'),
-    imagen: cat.imagen?.url ? { url: cat.imagen.url } : null,
-  }));
+  const response = await res.json();
+  const categoriasData = response.data || [];
+
+  return categoriasData
+    .map((cat: any) => {
+      const nombre = cat.nombre || cat.attributes?.nombre || "Sin nombre";
+      const slug = cat.slug || cat.attributes?.slug || nombre.toLowerCase().replace(/\s+/g, '-');
+      
+      let imagenUrl = null;
+      if (cat.imagen?.url) {
+        imagenUrl = cat.imagen.url;
+      } else if (cat.imagen?.data?.attributes?.url) {
+        imagenUrl = cat.imagen.data.attributes.url;
+      } else if (cat.attributes?.imagen?.data?.attributes?.url) {
+        imagenUrl = cat.attributes.imagen.data.attributes.url;
+      }
+
+      return {
+        id: cat.id,
+        nombre: nombre,
+        slug: slug,
+        imagen: imagenUrl ? { url: imagenUrl } : null,
+      };
+    })
+    // 🆕 ORDENAR AQUÍ, en la fuente de datos
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
 }

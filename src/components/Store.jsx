@@ -7,15 +7,25 @@ import CategoriasBar from "./CategoriasBar";
 export default function Store() {
   const [productos, setProductos] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  const [categoriaActiva, setCategoriaActiva] = useState("todas");
+  const [categoriaActiva, setCategoriaActiva] = useState(null); // 🆕 Cambiado de "todas" a null
   const [loading, setLoading] = useState(true);
   const [headerHeight, setHeaderHeight] = useState(0);
 
   useEffect(() => {
     Promise.all([getProductos(), getCategorias()])
       .then(([prods, cats]) => {
+        // 🆕 Ordenar categorías A-Z
+        const catsOrdenadas = [...cats].sort((a, b) =>
+          a.nombre.localeCompare(b.nombre, 'es')
+        );
+        
         setProductos(prods);
-        setCategorias(cats);
+        setCategorias(catsOrdenadas);
+        
+        // 🆕 Seleccionar la primera categoría por defecto
+        if (catsOrdenadas.length > 0) {
+          setCategoriaActiva(catsOrdenadas[0].slug);
+        }
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -43,8 +53,8 @@ export default function Store() {
       currency: "USD",
     }).format(value);
 
-  if (loading) {
-    return <div className="loading">Cargando...</div>;
+  if (loading || categoriaActiva === null) {
+    return <div className="loading">Cargando tienda...</div>;
   }
 
   return (
@@ -75,7 +85,7 @@ export default function Store() {
         />
       </div>
 
-      {/* 📦 PRODUCTOS (con margen compensatorio) */}
+      {/* 📦 PRODUCTOS */}
       <div className="productos-grid" style={{ marginTop: `${headerHeight + 56 + 20}px` }}>
         {productosFiltrados.length === 0 ? (
           <p className="no-products">No hay productos en esta categoría</p>

@@ -4,7 +4,6 @@ import { getStrapiMedia } from "../services/api";
 export default function CategoriasBar({ categorias, categoriaActiva, onSelect }) {
   const scrollRef = useRef(null);
 
-  // 🖱️ Scroll horizontal con rueda del mouse
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -21,12 +20,6 @@ export default function CategoriasBar({ categorias, categoriaActiva, onSelect })
 
   return (
     <div className="categorias-scroll" ref={scrollRef}>
-      <button
-        className={`cat-chip ${categoriaActiva === "todas" ? "active" : ""}`}
-        onClick={() => onSelect("todas")}
-      >
-        🏪 Todo
-      </button>
       {categorias.map((cat) => (
         <button
           key={cat.id}
