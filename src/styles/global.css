@@ -2,7 +2,7 @@
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  padding-bottom: 80px;
+  padding: 0;
 }
 
 h1, h2, h3 {
@@ -21,6 +21,7 @@ input, textarea {
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 16px;
+  box-sizing: border-box;
 }
 
 .container {
@@ -29,33 +30,55 @@ input, textarea {
   padding: 1rem;
 }
 
-/* ========== HEADER ========== */
+/* ========== HEADER (FIJO) ========== */
 .header {
   background: #1a1a2e;
   color: white;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
   overflow: hidden;
+  min-height: 64px;
 }
 
 .header-bg {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  flex-wrap: wrap;
-  opacity: 0.15;
+  width: 100%;
+  height: 100%;
+  opacity: 0.12;
   z-index: 0;
+  pointer-events: none;
 }
 
-.header-bg img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
+.header-bg-track {
+  display: flex;
+  gap: 1rem;
+  animation: scroll-header-bg 40s linear infinite;
+  width: max-content;
+  height: 100%;
+  align-items: center;
+}
+
+.header-bg-track img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 50%;
   flex-shrink: 0;
+  opacity: 0.8;
+}
+
+@keyframes scroll-header-bg {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .header-inner {
@@ -120,45 +143,11 @@ input, textarea {
   font-weight: 500;
   transition: all 0.2s ease;
   border: 1px solid rgba(255,255,255,0.2);
+  white-space: nowrap;
 }
 
 .btn-quienes-somos:hover {
   background: rgba(255,255,255,0.25);
-}
-
-.btn-cart-header {
-  position: relative;
-  background: rgba(255,255,255,0.15);
-  color: white;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  font-size: 1.3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  border: 1px solid rgba(255,255,255,0.2);
-}
-
-.btn-cart-header:hover {
-  background: rgba(255,255,255,0.25);
-}
-
-.cart-badge-header {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #e74c3c;
-  color: white;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  font-size: 0.7rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
 }
 
 /* ========== MODAL QUIÉNES SOMOS ========== */
@@ -169,7 +158,7 @@ input, textarea {
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.7);
-  z-index: 2000;
+  z-index: 3000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -241,6 +230,79 @@ input, textarea {
   color: #333;
 }
 
+/* ========== BARRA DE CATEGORÍAS (FIJA) ========== */
+.categorias-barra-fija {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.categorias-scroll {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  width: 100%;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.categorias-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.cat-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 1.1rem;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 25px;
+  background: white;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  height: 38px;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+.cat-chip:hover {
+  background: #f0f0f0;
+}
+
+.cat-chip.active {
+  background: #2c3e50;
+  color: white;
+  border-color: #2c3e50;
+}
+
+.cat-chip-img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.cat-chip-icon {
+  font-size: 1rem;
+}
+
 /* ========== PRODUCTOS ========== */
 .productos-grid {
   display: grid;
@@ -262,7 +324,8 @@ input, textarea {
   transform: translateY(-5px);
 }
 
-.card img {
+.card img,
+.product-img {
   width: 100%;
   height: 200px;
   object-fit: contain;
@@ -278,14 +341,6 @@ input, textarea {
 
 .card-body .btn {
   margin-top: auto;
-}
-
-.product-img {
-  width: 100%;
-  height: 200px;
-  object-fit: contain;
-  border-radius: 8px;
-  background: #f5f5f5;
 }
 
 .precio {
@@ -610,67 +665,7 @@ input, textarea {
   background: #27ae60;
 }
 
-/* ========== BARRA DE CATEGORÍAS ========== */
-.categorias-scroll {
-  display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  width: 100%;
-  align-items: center;
-  height: 100%;
-  flex-wrap: nowrap;
-}
-
-.categorias-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.cat-chip {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0 1.1rem;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 25px;
-  background: white;
-  cursor: pointer;
-  white-space: nowrap;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #555;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  height: 38px;
-  box-sizing: border-box;
-  margin: 0;
-  line-height: 1;
-}
-
-.cat-chip:hover {
-  background: #f0f0f0;
-}
-
-.cat-chip.active {
-  background: #2c3e50;
-  color: white;
-  border-color: #2c3e50;
-}
-
-.cat-chip-img {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.cat-chip-icon {
-  font-size: 1rem;
-}
-
+/* ========== CONTENIDO DE TIENDA ========== */
 .store-content {
   padding: 1rem 0;
 }
@@ -698,6 +693,7 @@ input, textarea {
 
   .productos-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
   }
 
   .product-img,
@@ -779,57 +775,7 @@ input, textarea {
     padding: 0.4rem 0.7rem;
   }
 
-  .btn-cart-header {
-    width: 36px;
-    height: 36px;
-    font-size: 1.1rem;
+  .categorias-barra-fija {
+    padding: 0 0.5rem;
   }
-}
-
-/* ========== HEADER BACKGROUND CARRUSEL ========== */
-
-.header {
-  position: relative;
-  overflow: hidden;
-}
-
-.header-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.12;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.header-bg-track {
-  display: flex;
-  gap: 1rem;
-  animation: scroll-header-bg 40s linear infinite;
-  width: max-content;
-}
-
-.header-bg img {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  border-radius: 50%;
-  flex-shrink: 0;
-  opacity: 0.8;
-}
-
-@keyframes scroll-header-bg {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.header-inner {
-  position: relative;
-  z-index: 1;
 }
