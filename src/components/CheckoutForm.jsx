@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getCart } from "../store/cart";
-import { crearPedido, getConfiguracion } from "../services/api";
+import { getConfiguracion } from "../services/api";
 
 // 🧠 Función para validar número de teléfono
 const validarTelefono = (telefono) => {
@@ -113,11 +113,6 @@ export default function CheckoutForm() {
       const telefonoDestino = config?.telefono_whatsapp || "0000000000";
       const mensajeBase = config?.mensaje_base || "Nuevo pedido:";
 
-      await crearPedido({
-        ...form,
-        productos: cart,
-        total: total
-      });
 
       // 🟢 Crear mensaje
       let mensaje = `${mensajeBase}\n\n`;

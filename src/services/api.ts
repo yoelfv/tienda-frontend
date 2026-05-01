@@ -65,21 +65,6 @@ export async function getProductos() {
   });
 }
 
-export async function getPedidos() {
-  const res = await fetch(`${getApiUrl()}/pedidos?sort=createdAt:desc`, {
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.error("Error API pedidos:", res.status, errorText);
-    throw new Error(`Error ${res.status}: fallo al obtener pedidos`);
-  }
-
-  const data = await res.json();
-  return data.data || [];
-}
-
 export async function getConfiguracion() {
   const res = await fetch(`${getApiUrl()}/configuracion`, {
     cache: "no-store",

@@ -3,7 +3,7 @@ import { useState } from "react";
 export default function SafeImage({
   src,
   alt = "Imagen",
-  fallback = "/placeholder.jpg",
+  fallback = "https://res.cloudinary.com/dllyinogi/image/upload/v1777646899/placeholder_u6r8km.png",
   className = "",
   ...props
 }) {
