@@ -1,3 +1,5 @@
+import InputField from "../ui/InputField";
+
 export default function SenderForm({
   formData,
   handleChange,
@@ -6,27 +8,19 @@ export default function SenderForm({
   return (
     <div className="checkout-section">
       <h3>Tus datos</h3>
-
-      <input
+      <InputField
         name="nombre_envia"
         value={formData.nombre_envia}
         onChange={handleChange}
         placeholder="Nombre de quien envía *"
       />
-
-      <input
+      <InputField
         name="telefono_envia"
         value={formData.telefono_envia}
         onChange={handleChange}
         placeholder="Teléfono de quien envía *"
-        className={errors.telefono_envia ? "input-error" : ""}
+        error={errors.telefono_envia}
       />
-
-      {errors.telefono_envia && (
-        <span className="error-message">
-          {errors.telefono_envia}
-        </span>
-      )}
     </div>
   );
 }

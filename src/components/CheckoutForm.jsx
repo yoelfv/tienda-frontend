@@ -77,11 +77,7 @@ export default function CheckoutForm() {
       const targetPhone = config?.telefono_whatsapp || "0000000000";
       const baseMessage = config?.mensaje_base || "Nuevo pedido:";
 
-      const message = buildWhatsAppMessage(formData,cart,total,config);
-
-      if (formData.nota) {
-        message += `📝 Nota: ${formData.nota}\n`;
-      }
+      const message = buildWhatsAppMessage(formData, cart, total, config);
 
       const whatsappUrl = `https://wa.me/${targetPhone}?text=${message}`;
       window.open(whatsappUrl, "_blank", "noopener,noreferrer");

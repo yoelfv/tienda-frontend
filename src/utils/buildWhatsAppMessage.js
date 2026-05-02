@@ -19,8 +19,10 @@ export const buildWhatsAppMessage = (formData, cart, total, config) => {
 
   message += `💵 Total: $${total}\n\n`;
 
-  if (formData.nota) {
-    message += `📝 Nota: ${formData.nota}\n`;
+  const nota = formData.nota?.trim();
+
+  if (nota) {
+    message += `📝 Nota: ${nota}\n`;
   }
 
   return encodeURIComponent(message);

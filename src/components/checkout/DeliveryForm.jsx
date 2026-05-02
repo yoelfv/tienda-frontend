@@ -1,3 +1,5 @@
+import InputField from "../ui/InputField";
+
 export default function DeliveryForm({
   formData,
   handleChange,
@@ -6,36 +8,27 @@ export default function DeliveryForm({
   return (
     <div className="checkout-section">
       <h3>Datos de entrega</h3>
-
-      <input
+      <InputField
         name="nombre_recibe"
         value={formData.nombre_recibe}
         onChange={handleChange}
         placeholder="Nombre y apellidos de quien recibe *"
       />
-
-      <input
+      <InputField
         name="telefono_recibe"
         value={formData.telefono_recibe}
         onChange={handleChange}
         placeholder="Teléfono de quien recibe *"
-        className={errors.telefono_recibe ? "input-error" : ""}
+        error={errors.telefono_recibe}
       />
-
-      {errors.telefono_recibe && (
-        <span className="error-message">
-          {errors.telefono_recibe}
-        </span>
-      )}
-
-      <input
+      <InputField
         name="direccion"
         value={formData.direccion}
         onChange={handleChange}
         placeholder="Dirección de entrega *"
       />
-
-      <textarea
+      <InputField
+        as="textarea"
         name="nota"
         value={formData.nota}
         onChange={handleChange}

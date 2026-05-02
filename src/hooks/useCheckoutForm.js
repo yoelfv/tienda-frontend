@@ -11,12 +11,12 @@ export function useCheckoutForm() {
   });
 
   const updateField = (e) => {
-    const { name, value } = e.target;
+  const { name, value } = e.target;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+  setFormData(prev => ({
+    ...prev,
+    [name]: value ?? ""
+   }));
   };
 
   return {
