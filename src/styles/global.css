@@ -591,6 +591,14 @@ input, textarea {
   border-radius: 10px;
 }
 
+.checkout-page {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+}
+
 .checkout-section {
   margin-bottom: 1.5rem;
 }
@@ -763,7 +771,7 @@ input, textarea {
 }
 
 main.container {
-  margin-top: 80px; /* ajusta si hace falta */
+  margin-top: 64px;
 }
 
 .categories-fixed-wrapper {

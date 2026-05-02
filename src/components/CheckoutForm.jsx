@@ -1,32 +1,17 @@
 import { useState, useEffect } from "react";
 import { getCart } from "../store/cart";
 import { getConfiguracion } from "../services/api";
-
-// 🧠 Función para validar número de teléfono
-const validarTelefono = (telefono) => {
-  // Eliminar espacios y guiones para validar
-  const limpio = telefono.replace(/[\s\-]/g, "");
-  
-  // Regex: acepta formatos como +5355555555, 55555555, +1(555)555-5555
-  const regexTelefono = /^(\+?\d{1,3})?[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}$/;
-  
-  return regexTelefono.test(limpio) && limpio.length >= 8;
-};
+import { useCheckoutForm } from "../hooks/useCheckoutForm";
+import { validatePhone, validateCheckout } from "../utils/checkoutValidators";
+import { buildWhatsAppMessage } from "../utils/buildWhatsAppMessage";
+import OrderSummary from "./checkout/OrderSummary";
 
 export default function CheckoutForm() {
   const [cart, setCart] = useState([]);
-
-  const [form, setForm] = useState({
-    nombre_envia: "",
-    telefono_envia: "",
-    nombre_recibe: "",
-    telefono_recibe: "",
-    direccion: "",
-    nota: ""
-  });
+  const { formData, updateField } = useCheckoutForm();
 
   // 📋 Estado para errores de validación
-  const [errores, setErrores] = useState({
+  const [errors, setErrors] = useState({
     telefono_envia: "",
     telefono_recibe: ""
   });
@@ -42,107 +27,62 @@ export default function CheckoutForm() {
 
   // 🔄 Validar teléfono en tiempo real mientras escribe
   const handleChange = (e) => {
-    const { name, value } = e.target;
+  const { name, value } = e.target;
 
-    setForm({
-      ...form,
-      [name]: value
-    });
+  // 👉 actualizar estado global del hook
+  updateField(e);
 
-    // Validar teléfonos en tiempo real
-    if (name === "telefono_envia") {
-      if (value.length > 0 && !validarTelefono(value)) {
-        setErrores(prev => ({
-          ...prev,
-          telefono_envia: "❌ Ingresa un número de teléfono válido"
-        }));
-      } else {
-        setErrores(prev => ({ ...prev, telefono_envia: "" }));
-      }
+  // 👉 validaciones (se quedan igual)
+  if (name === "telefono_envia") {
+    if (value.length > 0 && !validatePhone(value)) {
+      setErrors(prev => ({
+        ...prev,
+        telefono_envia: "❌ Ingresa un número de teléfono válido"
+      }));
+    } else {
+      setErrors(prev => ({ ...prev, telefono_envia: "" }));
     }
+  }
 
-    if (name === "telefono_recibe") {
-      if (value.length > 0 && !validarTelefono(value)) {
-        setErrores(prev => ({
-          ...prev,
-          telefono_recibe: "❌ Ingresa un número de teléfono válido"
-        }));
-      } else {
-        setErrores(prev => ({ ...prev, telefono_recibe: "" }));
-      }
+  if (name === "telefono_recibe") {
+    if (value.length > 0 && !validatePhone(value)) {
+      setErrors(prev => ({
+        ...prev,
+        telefono_recibe: "❌ Ingresa un número de teléfono válido"
+      }));
+    } else {
+      setErrors(prev => ({ ...prev, telefono_recibe: "" }));
     }
-  };
+  }
+};
 
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const enviarPedido = async () => {
-    if (loading) return;
+  const submitOrder = async () => {
+    if (isLoading) return;
 
-    // ✅ Validación completa antes de enviar
-    if (cart.length === 0) {
-      alert("Tu carrito está vacío");
+    const error = validateCheckout(formData, cart);
+
+    if (error) {
+      alert(error);
       return;
     }
 
-    if (
-      !form.nombre_envia ||
-      !form.telefono_envia ||
-      !form.nombre_recibe ||
-      !form.telefono_recibe ||
-      !form.direccion
-    ) {
-      alert("Por favor completa todos los campos obligatorios");
-      return;
-    }
-
-    // 🔢 Validar teléfonos
-    if (!validarTelefono(form.telefono_envia)) {
-      alert("El número de teléfono de quien envía no es válido");
-      return;
-    }
-
-    if (!validarTelefono(form.telefono_recibe)) {
-      alert("El número de teléfono de quien recibe no es válido");
-      return;
-    }
-
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       const config = await getConfiguracion();
-      const telefonoDestino = config?.telefono_whatsapp || "0000000000";
-      const mensajeBase = config?.mensaje_base || "Nuevo pedido:";
+      const targetPhone = config?.telefono_whatsapp || "0000000000";
+      const baseMessage = config?.mensaje_base || "Nuevo pedido:";
 
+      const message = buildWhatsAppMessage(formData,cart,total,config);
 
-      // 🟢 Crear mensaje
-      let mensaje = `${mensajeBase}\n\n`;
-
-      // 👤 Datos de quien envía
-      mensaje += `👤 DATOS DE QUIEN ENVÍA:\n`;
-      mensaje += `📛 Nombre: ${form.nombre_envia}\n`;
-      mensaje += `📞 Teléfono: ${form.telefono_envia}\n\n`;
-
-      // 📦 Datos de entrega
-      mensaje += `📦 DATOS DE ENTREGA:\n`;
-      mensaje += `📛 Nombre: ${form.nombre_recibe}\n`;
-      mensaje += `📞 Teléfono: ${form.telefono_recibe}\n`;
-      mensaje += `📍 Dirección: ${form.direccion}\n\n`;
-
-      // 🛒 Productos
-      mensaje += `🛒 PRODUCTOS:\n`;
-      cart.forEach(p => {
-        mensaje += `• ${p.nombre} x${p.quantity} = $${p.precio * p.quantity}\n`;
-      });
-
-      mensaje += `\n💰 Subtotal: $${total}\n`;
-      mensaje += `💵 Total: $${total}\n\n`;
-
-      if (form.nota) {
-        mensaje += `📝 Nota: ${form.nota}\n`;
+      if (formData.nota) {
+        message += `📝 Nota: ${formData.nota}\n`;
       }
 
-      const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
-      window.open(url, "_blank", "noopener,noreferrer");
+      const whatsappUrl = `https://wa.me/${targetPhone}?text=${message}`;
+      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
 
       localStorage.removeItem("cart");
       window.dispatchEvent(new Event("cartUpdated"));
@@ -152,7 +92,7 @@ export default function CheckoutForm() {
       console.error(error);
       alert("Error al enviar pedido");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -166,35 +106,26 @@ export default function CheckoutForm() {
       </button>
 
       {/* 🛒 RESUMEN */}
-      <div className="checkout-section">
-        <h3>Resumen del pedido</h3>
-        {cart.map(item => (
-          <div key={item.id} className="resumen-item">
-            <span>{item.nombre} x{item.quantity}</span>
-            <span>${item.precio * item.quantity}</span>
-          </div>
-        ))}
-        <h3>Total: ${total}</h3>
-      </div>
+      <OrderSummary cart={cart} total={total} />
 
       {/* 👤 DATOS QUIEN ENVÍA */}
       <div className="checkout-section">
         <h3>Tus datos</h3>
         <input
           name="nombre_envia"
-          value={form.nombre_envia}
+          value={formData.nombre_envia}
           onChange={handleChange}
           placeholder="Nombre de quien envía *"
         />
         <input
           name="telefono_envia"
-          value={form.telefono_envia}
+          value={formData.telefono_envia}
           onChange={handleChange}
           placeholder="Teléfono de quien envía *"
-          className={errores.telefono_envia ? "input-error" : ""}
+          className={errors.telefono_envia ? "input-error" : ""}
         />
-        {errores.telefono_envia && (
-          <span className="error-message">{errores.telefono_envia}</span>
+        {errors.telefono_envia && (
+          <span className="error-message">{errors.telefono_envia}</span>
         )}
       </div>
 
@@ -203,29 +134,29 @@ export default function CheckoutForm() {
         <h3>Datos de entrega</h3>
         <input
           name="nombre_recibe"
-          value={form.nombre_recibe}
+          value={formData.nombre_recibe}
           onChange={handleChange}
           placeholder="Nombre y apellidos de quien recibe *"
         />
         <input
           name="telefono_recibe"
-          value={form.telefono_recibe}
+          value={formData.telefono_recibe}
           onChange={handleChange}
           placeholder="Teléfono de quien recibe *"
-          className={errores.telefono_recibe ? "input-error" : ""}
+          className={errors.telefono_recibe ? "input-error" : ""}
         />
-        {errores.telefono_recibe && (
-          <span className="error-message">{errores.telefono_recibe}</span>
+        {errors.telefono_recibe && (
+          <span className="error-message">{errors.telefono_recibe}</span>
         )}
         <input
           name="direccion"
-          value={form.direccion}
+          value={formData.direccion}
           onChange={handleChange}
           placeholder="Dirección de entrega *"
         />
         <textarea
           name="nota"
-          value={form.nota}
+          value={formData.nota}
           onChange={handleChange}
           placeholder="Nota adicional (opcional)"
         ></textarea>
@@ -233,10 +164,10 @@ export default function CheckoutForm() {
 
       <button
         className="btn-primary"
-        onClick={enviarPedido}
-        disabled={loading}
+        onClick={submitOrder}
+        disabled={isLoading}
       >
-        {loading ? "Enviando..." : "Enviar pedido por WhatsApp"}
+        {isLoading ? "Enviando..." : "Enviar pedido por WhatsApp"}
       </button>
     </div>
   );
