@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { getStrapiMedia } from "../services/api";
 
-export default function CategoriasBar({ categorias, categoriaActiva, onSelect }) {
+export default function CategoriesBar({ categorias, categoriaActiva, onSelect }) {
   const scrollRef = useRef(null);
 
   useEffect(() => {

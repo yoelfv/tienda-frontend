@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { getProductos, getCategorias, getStrapiMedia } from "../services/api";
 import AddToCart from "./AddToCart";
 import SafeImage from "./SafeImage";
-import CategoriasBar from "./CategoriasBar";
+import CategoriesBar from "./CategoriesBar";
 
 export default function Store() {
   const [productos, setProductos] = useState([]);
@@ -78,7 +78,7 @@ export default function Store() {
           boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
         }}
       >
-        <CategoriasBar
+        <CategoriesBar
           categorias={categorias}
           categoriaActiva={categoriaActiva}
           onSelect={setCategoriaActiva}

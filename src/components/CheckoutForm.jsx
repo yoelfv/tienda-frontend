@@ -142,11 +142,11 @@ export default function CheckoutForm() {
       }
 
       const url = `https://wa.me/${telefonoDestino}?text=${encodeURIComponent(mensaje)}`;
-      window.open(url, "_blank");
+      window.open(url, "_blank", "noopener,noreferrer");
 
       localStorage.removeItem("cart");
       window.dispatchEvent(new Event("cartUpdated"));
-      window.location.href = "/pedido-exitoso";
+      window.location.href = "/order-success";
 
     } catch (error) {
       console.error(error);

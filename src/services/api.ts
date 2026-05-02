@@ -15,22 +15,7 @@ export function getStrapiMedia(url: string | null | undefined): string {
   return `${STRAPI_URL}${url}`;
 }
 
-export async function crearPedido(pedido: any) {
-  const res = await fetch(`${getApiUrl()}/pedidos`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ data: pedido }),
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.error("Error backend:", errorText);
-    throw new Error(`Error ${res.status}: No se pudo guardar el pedido`);
-  }
-
-  return await res.json();
-}
-
+// 📦 PRODUCTOS
 export async function getProductos() {
   const res = await fetch(`${getApiUrl()}/products?populate=*`, {
     cache: "no-store",
@@ -49,7 +34,9 @@ export async function getProductos() {
 
     if (producto.descripcion && Array.isArray(producto.descripcion)) {
       descripcionTexto = producto.descripcion
-        .map((block: any) => block.children?.map((child: any) => child.text).join(""))
+        .map((block: any) =>
+          block.children?.map((child: any) => child.text).join("")
+        )
         .join("\n");
     }
 
@@ -65,6 +52,7 @@ export async function getProductos() {
   });
 }
 
+// ⚙️ CONFIG
 export async function getConfiguracion() {
   const res = await fetch(`${getApiUrl()}/configuracion`, {
     cache: "no-store",
@@ -80,6 +68,7 @@ export async function getConfiguracion() {
   return data.data || {};
 }
 
+// 🗂️ CATEGORÍAS
 export async function getCategorias() {
   const res = await fetch(`${getApiUrl()}/categorias?populate=*`, {
     cache: "no-store",
@@ -96,10 +85,16 @@ export async function getCategorias() {
 
   return categoriasData
     .map((cat: any) => {
-      const nombre = cat.nombre || cat.attributes?.nombre || "Sin nombre";
-      const slug = cat.slug || cat.attributes?.slug || nombre.toLowerCase().replace(/\s+/g, '-');
-      
+      const nombre =
+        cat.nombre || cat.attributes?.nombre || "Sin nombre";
+
+      const slug =
+        cat.slug ||
+        cat.attributes?.slug ||
+        nombre.toLowerCase().replace(/\s+/g, "-");
+
       let imagenUrl = null;
+
       if (cat.imagen?.url) {
         imagenUrl = cat.imagen.url;
       } else if (cat.imagen?.data?.attributes?.url) {
@@ -110,11 +105,12 @@ export async function getCategorias() {
 
       return {
         id: cat.id,
-        nombre: nombre,
-        slug: slug,
+        nombre,
+        slug,
         imagen: imagenUrl ? { url: imagenUrl } : null,
       };
     })
-    // 🆕 ORDENAR AQUÍ, en la fuente de datos
-    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+    .sort((a: any, b: any) =>
+      a.nombre.localeCompare(b.nombre, "es")
+    );
 }

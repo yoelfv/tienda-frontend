@@ -765,3 +765,17 @@ input, textarea {
 main.container {
   margin-top: 80px; /* ajusta si hace falta */
 }
+
+.categories-fixed-wrapper {
+  position: fixed;
+  top: 64px; /* altura del header */
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: white;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  overflow: visible;
+}
