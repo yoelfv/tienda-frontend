@@ -5,6 +5,8 @@ import { useCheckoutForm } from "../hooks/useCheckoutForm";
 import { validatePhone, validateCheckout } from "../utils/checkoutValidators";
 import { buildWhatsAppMessage } from "../utils/buildWhatsAppMessage";
 import OrderSummary from "./checkout/OrderSummary";
+import SenderForm from "./checkout/SenderForm";
+import DeliveryForm from "./checkout/DeliveryForm";
 
 export default function CheckoutForm() {
   const [cart, setCart] = useState([]);
@@ -109,58 +111,18 @@ export default function CheckoutForm() {
       <OrderSummary cart={cart} total={total} />
 
       {/* 👤 DATOS QUIEN ENVÍA */}
-      <div className="checkout-section">
-        <h3>Tus datos</h3>
-        <input
-          name="nombre_envia"
-          value={formData.nombre_envia}
-          onChange={handleChange}
-          placeholder="Nombre de quien envía *"
-        />
-        <input
-          name="telefono_envia"
-          value={formData.telefono_envia}
-          onChange={handleChange}
-          placeholder="Teléfono de quien envía *"
-          className={errors.telefono_envia ? "input-error" : ""}
-        />
-        {errors.telefono_envia && (
-          <span className="error-message">{errors.telefono_envia}</span>
-        )}
-      </div>
+      <SenderForm
+        formData={formData}
+        handleChange={handleChange}
+        errors={errors}
+      />
 
       {/* 📦 DATOS ENTREGA */}
-      <div className="checkout-section">
-        <h3>Datos de entrega</h3>
-        <input
-          name="nombre_recibe"
-          value={formData.nombre_recibe}
-          onChange={handleChange}
-          placeholder="Nombre y apellidos de quien recibe *"
-        />
-        <input
-          name="telefono_recibe"
-          value={formData.telefono_recibe}
-          onChange={handleChange}
-          placeholder="Teléfono de quien recibe *"
-          className={errors.telefono_recibe ? "input-error" : ""}
-        />
-        {errors.telefono_recibe && (
-          <span className="error-message">{errors.telefono_recibe}</span>
-        )}
-        <input
-          name="direccion"
-          value={formData.direccion}
-          onChange={handleChange}
-          placeholder="Dirección de entrega *"
-        />
-        <textarea
-          name="nota"
-          value={formData.nota}
-          onChange={handleChange}
-          placeholder="Nota adicional (opcional)"
-        ></textarea>
-      </div>
+      <DeliveryForm
+        formData={formData}
+        handleChange={handleChange}
+        errors={errors}
+      />
 
       <button
         className="btn-primary"
