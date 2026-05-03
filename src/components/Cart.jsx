@@ -53,7 +53,15 @@ export default function Cart() {
             <>
               {cart.map(item => (
                 <div key={item.id} className="cart-item">
-                  <p><strong>{item.nombre}</strong></p>
+                  
+                  <div className="cart-item-top">
+                    <div className="cart-item-info">
+                      <p className="cart-item-name">{item.nombre}</p>
+                      <p className="cart-item-price">
+                        ${formatPrice(item.precio)}
+                      </p>
+                    </div>
+                  </div>
 
                   <div className="qty-controls">
                     <button
@@ -62,7 +70,9 @@ export default function Cart() {
                     >
                       −
                     </button>
+
                     <span>{item.quantity}</span>
+
                     <button
                       onClick={() => updateQuantity(item.id, 1)}
                       disabled={item.quantity >= 10}
@@ -71,7 +81,9 @@ export default function Cart() {
                     </button>
                   </div>
 
-                  <p>Subtotal: ${formatPrice(item.precio * item.quantity)}</p>
+                  <p className="cart-item-subtotal">
+                    Subtotal: ${formatPrice(item.precio * item.quantity)}
+                  </p>
 
                   <button
                     className="remove-btn"

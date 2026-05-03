@@ -46,6 +46,24 @@ const { title = nombreTienda } = Astro.props;
 
 // Duplicar imágenes para el carrusel infinito
 const imagenesDuplicadas = [...imagenesCategorias, ...imagenesCategorias];
+
+// Optimizar la imagen del logo
+const optimizeImage = (url: string, width: number = 100): string => {
+  if (!url) return "";
+
+  if (url.includes("/upload/")) {
+    return url.replace("/upload/", `/upload/f_auto,q_auto,w_${width}/`);
+  }
+
+  return url;
+};
+
+const finalLogo = logoUrl
+  ? optimizeImage(
+      logoUrl.startsWith("http") ? logoUrl : `${API_URL}${logoUrl}`,
+      100
+    )
+  : "";
 ---
 
 <html lang="es">
@@ -78,9 +96,10 @@ const imagenesDuplicadas = [...imagenesCategorias, ...imagenesCategorias];
         <div class="header-left" id="btn-info-tienda">
           {logoUrl ? (
             <img
-              src={logoUrl.startsWith('http') ? logoUrl : `${API_URL}${logoUrl}`}
+              src={finalLogo}
               alt={nombreTienda}
               class="header-logo"
+              loading="eager"
             />
           ) : (
             <div

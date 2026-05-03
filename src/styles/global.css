@@ -547,9 +547,41 @@ input, textarea {
 }
 
 .cart-item {
-  border-bottom: 1px solid #eee;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
+  background: #fafafa;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #eee;
+}
+
+.cart-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.cart-item-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cart-item-name {
+  font-weight: 600;
+  margin: 0;
+}
+
+.cart-item-price {
+  color: #27ae60;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.cart-item-subtotal {
+  font-size: 0.85rem;
+  margin-top: 4px;
+  color: #777;
 }
 
 /* ========== CARRITO CONTROLES ========== */

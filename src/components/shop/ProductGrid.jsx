@@ -29,6 +29,7 @@ function ProductCard({ product, formatPrice }) {
         src={getStrapiMedia(product.imagen?.url)}
         alt={product.nombre}
         className="product-img"
+        width={400}
       />
 
       <div className="card-body">
