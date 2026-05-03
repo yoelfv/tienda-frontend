@@ -48,7 +48,7 @@ const { title = nombreTienda } = Astro.props;
 const imagenesDuplicadas = [...imagenesCategorias, ...imagenesCategorias];
 
 // Optimizar la imagen del logo
-const optimizeImage = (url: string, width: number = 100): string => {
+const optimizeImage = (url: string | null, width: number = 100): string => {
   if (!url) return "";
 
   if (url.includes("/upload/")) {
