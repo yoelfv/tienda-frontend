@@ -5,7 +5,6 @@ const API_URL: string = import.meta.env.PUBLIC_API_URL || "https://tienda-backen
 
 let nombreTienda: string = "Mi Tienda";
 let logoUrl: string | null = null;
-let imagenesCategorias: string[] = [];
 
 function extraerUrlImagen(imagen: any): string | null {
   if (!imagen) return null;
@@ -27,32 +26,21 @@ try {
     nombreTienda = config.nombre_tienda || "Mi Tienda";
     logoUrl = extraerUrlImagen(config.logo);
   }
-
-  if (resCategorias.ok) {
-    const catData = await resCategorias.json();
-    const categorias = catData?.data || [];
-
-    if (Array.isArray(categorias)) {
-      imagenesCategorias = categorias
-        .map((cat: any) => extraerUrlImagen(cat.imagen))
-        .filter((url: unknown): url is string => typeof url === 'string');
-    }
-  }
 } catch (error) {
   console.error("Error al cargar datos del header:", error);
 }
 
 const { title = nombreTienda } = Astro.props;
 
-// Duplicar imágenes para el carrusel infinito
-const imagenesDuplicadas = [...imagenesCategorias, ...imagenesCategorias];
-
-// Optimizar la imagen del logo
-const optimizeImage = (url: string | null, width: number = 100): string => {
+// Optimizar las imágenes
+const optimizeImage = (url: string, width: number = 80): string => {
   if (!url) return "";
 
   if (url.includes("/upload/")) {
-    return url.replace("/upload/", `/upload/f_auto,q_auto,w_${width}/`);
+    return url.replace(
+      "/upload/",
+      `/upload/f_auto,q_auto,w_${width},c_fill/`
+    );
   }
 
   return url;
@@ -77,20 +65,6 @@ const finalLogo = logoUrl
 
   <body>
     <header class="header" id="main-header">
-      <!-- 🎠 CARRUSEL DE FONDO -->
-      {imagenesCategorias.length > 0 ? (
-        <div class="header-bg">
-          <div class="header-bg-track">
-            {imagenesDuplicadas.map((url: string) => (
-              <img
-                src={url.startsWith('http') ? url : `${API_URL}${url}`}
-                alt=""
-                loading="lazy"
-              />
-            ))}
-          </div>
-        </div>
-      ) : null}
 
       <div class="header-inner">
         <div class="header-left" id="btn-info-tienda">
@@ -230,5 +204,17 @@ const finalLogo = logoUrl
 
   document.getElementById('modal-quienes-somos')?.addEventListener('click', (e) => {
     if (e.target === e.currentTarget) cerrarModal();
+  });
+
+  const header = document.getElementById("main-header");
+
+  window.addEventListener("scroll", () => {
+    if (!header) return;
+
+    if (window.scrollY > 20) {
+      header.classList.add("scrolled");
+    } else {
+      header.classList.remove("scrolled");
+    }
   });
 </script>

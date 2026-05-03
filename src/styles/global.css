@@ -32,7 +32,7 @@ input, textarea {
 
 /* ========== HEADER (FIJO) ========== */
 .header {
-  background: #1a1a2e;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
   color: white;
   position: fixed;
   top: 0;
@@ -41,44 +41,62 @@ input, textarea {
   z-index: 1000;
   overflow: hidden;
   min-height: 64px;
+  animation: fadeDown 0.4s ease;
 }
 
-.header-bg {
+.header::before {
+  content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.12;
-  z-index: 0;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(46, 204, 113, 0.25), transparent);
+  top: -80px;
+  left: -80px;
+  filter: blur(60px);
   pointer-events: none;
 }
 
-.header-bg-track {
-  display: flex;
-  gap: 1rem;
-  animation: scroll-header-bg 40s linear infinite;
-  width: max-content;
+.header::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
   height: 100%;
-  align-items: center;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: shine 6s infinite;
 }
 
-.header-bg-track img {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  border-radius: 50%;
-  flex-shrink: 0;
-  opacity: 0.8;
-}
-
-@keyframes scroll-header-bg {
+@keyframes shine {
   0% {
-    transform: translateX(0);
+    left: -100%;
   }
   100% {
-    transform: translateX(-50%);
+    left: 200%;
   }
+}
+
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header.scrolled {
+  background: rgba(26, 26, 46, 0.85);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .header-inner {
@@ -107,6 +125,8 @@ input, textarea {
   background: white;
   padding: 4px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease;
 }
 
 .header-info {
@@ -133,6 +153,21 @@ input, textarea {
   gap: 0.8rem;
 }
 
+@media (max-width: 600px) {
+  .header-inner {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .header-name {
+    font-size: 1rem;
+  }
+
+  .header-logo {
+    width: 38px;
+    height: 38px;
+  }
+}
+
 /* ========== BOTONES DEL HEADER ========== */
 .btn-quienes-somos {
   background: rgba(255,255,255,0.15);
@@ -144,10 +179,15 @@ input, textarea {
   transition: all 0.2s ease;
   border: 1px solid rgba(255,255,255,0.2);
   white-space: nowrap;
+  transition: all 0.2s ease;
 }
 
 .btn-quienes-somos:hover {
   background: rgba(255,255,255,0.25);
+}
+
+.btn-quienes-somos:active {
+  transform: scale(0.95);
 }
 
 /* ========== MODAL QUIÉNES SOMOS ========== */
@@ -524,6 +564,15 @@ input, textarea {
   padding: 1.5rem;
 }
 
+.cart-panel-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.cart-panel-body::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+}
+
 .cart-empty {
   text-align: center;
   color: #888;
@@ -784,17 +833,52 @@ input, textarea {
   }
 
   .header-logo {
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    object-fit: cover;
+
+    background: white;
+    padding: 4px;
+
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+
+    transition: transform 0.2s ease;
+  }
+
+  .header-left:hover .header-logo {
+    transform: scale(1.05);
   }
 
   .header-name {
-    font-size: 1rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  .header-tagline {
+    font-size: 0.7rem;
+    color: #b0b0b0;
   }
 
   .btn-quienes-somos {
-    font-size: 0.75rem;
-    padding: 0.4rem 0.7rem;
+    background: rgba(255,255,255,0.12);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+
+    font-size: 0.85rem;
+    font-weight: 500;
+
+    backdrop-filter: blur(6px);
+
+    border: 1px solid rgba(255,255,255,0.2);
+
+    transition: all 0.2s ease;
+  }
+
+  .btn-quienes-somos:hover {
+    background: rgba(255,255,255,0.25);
   }
 
   .categorias-barra-fija {
@@ -818,4 +902,36 @@ main.container {
   align-items: center;
   border-bottom: 1px solid #e0e0e0;
   overflow: visible;
+}
+
+/* ===== Scrollbar moderna y discreta ===== */
+
+/* Chrome, Edge, Safari */
+body::-webkit-scrollbar {
+  width: 6px;
+}
+
+body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(
+    to bottom,
+    rgba(46, 204, 113, 0.4),
+    rgba(46, 204, 113, 0.2)
+  );
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.35) transparent;
 }
