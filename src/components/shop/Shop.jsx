@@ -36,7 +36,12 @@ export default function Shop() {
   }, []);
 
   if (loading || categoriaActiva === null) {
-    return <div className="loading">Cargando tienda...</div>;
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p className="loading-text">Cargando tienda...</p>
+      </div>
+    );
   }
 
   const productosFiltrados = productos.filter(
