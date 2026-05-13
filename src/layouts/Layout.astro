@@ -90,7 +90,7 @@ const finalLogo = logoUrl
         </div>
 
         <div class="header-right">
-          <button class="btn-quienes-somos" id="btn-quienes-somos">
+          <button class="btn-about-us" id="btn-about-us">
             📖 Quiénes Somos
           </button>
         </div>
@@ -173,7 +173,7 @@ const finalLogo = logoUrl
       const descripcionHTML = info.descripcion.replace(/\n/g, '<br>');
       body.innerHTML = `
         <p>${descripcionHTML}</p>
-        <div class="modal-contacto">
+        <div class="modal-contact">
           <p><strong>📍 Dirección:</strong> ${info.direccion}</p>
           <p><strong>📞 Teléfono:</strong> ${info.telefono}</p>
           <p><strong>✉️ Email:</strong> ${info.email}</p>
@@ -192,7 +192,7 @@ const finalLogo = logoUrl
     document.body.style.overflow = '';
   }
 
-  document.getElementById('btn-quienes-somos')?.addEventListener('click', async () => {
+  document.getElementById('btn-about-us')?.addEventListener('click', async () => {
     abrirModal(await cargarInfoTienda());
   });
 

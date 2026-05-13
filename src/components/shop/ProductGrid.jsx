@@ -14,7 +14,7 @@ export default function ProductGrid({ productos }) {
   }
 
   return (
-    <div className="productos-grid">
+    <div className="products-grid">
       {productos.map((p) => (
         <ProductCard key={p.id} product={p} formatPrice={formatPrice} />
       ))}

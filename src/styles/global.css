@@ -169,7 +169,7 @@ input, textarea {
 }
 
 /* ========== BOTONES DEL HEADER ========== */
-.btn-quienes-somos {
+.btn-about-us {
   background: rgba(255,255,255,0.15);
   color: white;
   padding: 0.5rem 1rem;
@@ -182,15 +182,15 @@ input, textarea {
   transition: all 0.2s ease;
 }
 
-.btn-quienes-somos:hover {
+.btn-about-us:hover {
   background: rgba(255,255,255,0.25);
 }
 
-.btn-quienes-somos:active {
+.btn-about-us:active {
   transform: scale(0.95);
 }
 
-/* ========== MODAL QUIÉNES SOMOS ========== */
+/* ========== MODAL QUIENES SOMOS ========== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -258,7 +258,7 @@ input, textarea {
   margin-bottom: 0.8rem;
 }
 
-.modal-contacto {
+.modal-contact {
   margin-top: 1.5rem;
   padding-top: 1rem;
   border-top: 1px solid #eee;
@@ -266,26 +266,12 @@ input, textarea {
   color: #666;
 }
 
-.modal-contacto strong {
+.modal-contact strong {
   color: #333;
 }
 
 /* ========== BARRA DE CATEGORÍAS (FIJA) ========== */
-.categorias-barra-fija {
-  position: fixed;
-  left: 0;
-  right: 0;
-  z-index: 999;
-  background: white;
-  border-bottom: 1px solid #e0e0e0;
-  display: flex;
-  align-items: center;
-  padding: 0 1rem;
-  box-sizing: border-box;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.categorias-scroll {
+.categories-scroll {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
@@ -297,7 +283,7 @@ input, textarea {
   flex-wrap: nowrap;
 }
 
-.categorias-scroll::-webkit-scrollbar {
+.categories-scroll::-webkit-scrollbar {
   display: none;
 }
 
@@ -344,7 +330,7 @@ input, textarea {
 }
 
 /* ========== PRODUCTOS ========== */
-.productos-grid {
+.products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1rem;
@@ -796,7 +782,7 @@ input, textarea {
     font-size: 16px;
   }
 
-  .productos-grid {
+  .products-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.8rem;
   }
@@ -895,7 +881,7 @@ input, textarea {
     color: #b0b0b0;
   }
 
-  .btn-quienes-somos {
+  .btn-about-us {
     background: rgba(255,255,255,0.12);
     color: white;
     padding: 0.5rem 1rem;
@@ -911,12 +897,8 @@ input, textarea {
     transition: all 0.2s ease;
   }
 
-  .btn-quienes-somos:hover {
+  .btn-about-us:hover {
     background: rgba(255,255,255,0.25);
-  }
-
-  .categorias-barra-fija {
-    padding: 0 0.5rem;
   }
 }
 

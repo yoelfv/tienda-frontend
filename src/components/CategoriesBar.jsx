@@ -19,7 +19,7 @@ export default function CategoriesBar({ categorias, categoriaActiva, onSelect })
   }, []);
 
   return (
-    <div className="categorias-scroll" ref={scrollRef}>
+    <div className="categories-scroll" ref={scrollRef}>
       {categorias.map((cat) => (
         <button
           key={cat.id}
