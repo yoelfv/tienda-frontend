@@ -5,17 +5,15 @@ export default function AddToCart({ product }) {
   const [added, setAdded] = useState(false);
 
   const handleAdd = () => {
-    // 🚫 si no disponible, no hacer nada
-    if (!product?.disponible) return;
+    if (!product?.available) return;
 
     if (!product || !product.id) {
-      console.warn("Producto inválido:", product);
+      console.warn("Invalid product:", product);
       return;
     }
 
-    // 🔍 verificar límite
     const cart = getCart();
-    const existing = cart.find(p => p.id === product.id);
+    const existing = cart.find(item => item.id === product.id);
 
     if (existing && existing.quantity >= 10) {
       alert("Has alcanzado el máximo de 10 unidades para este producto");
@@ -24,7 +22,6 @@ export default function AddToCart({ product }) {
 
     addToCart(product);
 
-    // ✨ feedback visual
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
@@ -33,9 +30,9 @@ export default function AddToCart({ product }) {
     <button
       className={`btn ${added ? "added" : ""}`}
       onClick={handleAdd}
-      disabled={!product?.disponible}
+      disabled={!product?.available}
     >
-      {!product?.disponible
+      {!product?.available
         ? "Agotado"
         : added
         ? "✔ Añadido"

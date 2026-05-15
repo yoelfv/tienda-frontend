@@ -15,7 +15,6 @@ export function getStrapiMedia(url: string | null | undefined): string {
   return `${STRAPI_URL}${url}`;
 }
 
-// 📦 PRODUCTOS
 export async function getProductos() {
   const res = await fetch(`${getApiUrl()}/products?populate=*`, {
     cache: "no-store",
@@ -30,10 +29,10 @@ export async function getProductos() {
   const data = await res.json();
 
   return (data.data || []).map((producto: any) => {
-    let descripcionTexto = "";
+    let descriptionText = "";  
 
     if (producto.descripcion && Array.isArray(producto.descripcion)) {
-      descripcionTexto = producto.descripcion
+      descriptionText = producto.descripcion
         .map((block: any) =>
           block.children?.map((child: any) => child.text).join("")
         )
@@ -42,17 +41,16 @@ export async function getProductos() {
 
     return {
       id: producto.id,
-      nombre: producto.nombre,
-      precio: producto.precio,
-      disponible: producto.disponible,
-      descripcion: descripcionTexto,
-      imagen: producto.imagen?.url ? { url: producto.imagen.url } : null,
-      categoria: producto.categoria || null,
+      name: producto.nombre,           
+      price: producto.precio,          
+      available: producto.disponible,  
+      description: descriptionText,    
+      image: producto.imagen?.url ? { url: producto.imagen.url } : null,  
+      category: producto.categoria || null,
     };
   });
 }
 
-// ⚙️ CONFIG
 export async function getConfiguracion() {
   const res = await fetch(`${getApiUrl()}/configuracion`, {
     cache: "no-store",
@@ -68,7 +66,6 @@ export async function getConfiguracion() {
   return data.data || {};
 }
 
-// 🗂️ CATEGORÍAS
 export async function getCategorias() {
   const res = await fetch(`${getApiUrl()}/categorias?populate=*`, {
     cache: "no-store",
@@ -81,36 +78,36 @@ export async function getCategorias() {
   }
 
   const response = await res.json();
-  const categoriasData = response.data || [];
+  const categoriesData = response.data || [];
 
-  return categoriasData
+  return categoriesData
     .map((cat: any) => {
-      const nombre =
+      const name =  
         cat.nombre || cat.attributes?.nombre || "Sin nombre";
 
       const slug =
         cat.slug ||
         cat.attributes?.slug ||
-        nombre.toLowerCase().replace(/\s+/g, "-");
+        name.toLowerCase().replace(/\s+/g, "-");
 
-      let imagenUrl = null;
+      let imageUrl = null;  // ← antes "imagenUrl"
 
       if (cat.imagen?.url) {
-        imagenUrl = cat.imagen.url;
+        imageUrl = cat.imagen.url;
       } else if (cat.imagen?.data?.attributes?.url) {
-        imagenUrl = cat.imagen.data.attributes.url;
+        imageUrl = cat.imagen.data.attributes.url;
       } else if (cat.attributes?.imagen?.data?.attributes?.url) {
-        imagenUrl = cat.attributes.imagen.data.attributes.url;
+        imageUrl = cat.attributes.imagen.data.attributes.url;
       }
 
       return {
         id: cat.id,
-        nombre,
+        name,                    // ← antes "nombre"
         slug,
-        imagen: imagenUrl ? { url: imagenUrl } : null,
+        image: imageUrl ? { url: imageUrl } : null,  // ← antes "imagen"
       };
     })
     .sort((a: any, b: any) =>
-      a.nombre.localeCompare(b.nombre, "es")
+      a.name.localeCompare(b.name, "es")  // ← actualizado
     );
 }

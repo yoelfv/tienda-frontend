@@ -2,21 +2,21 @@ import { getStrapiMedia } from "../../services/api";
 import AddToCart from "../AddToCart";
 import SafeImage from "../SafeImage";
 
-export default function ProductGrid({ productos }) {
+export default function ProductGrid({ products }) {  // ← antes "productos"
   const formatPrice = (value) =>
     new Intl.NumberFormat("es-ES", {
       style: "currency",
       currency: "USD",
     }).format(value);
 
-  if (!productos.length) {
+  if (!products.length) {  // ← actualizado
     return <p className="no-products">No hay productos en esta categoría</p>;
   }
 
   return (
     <div className="products-grid">
-      {productos.map((p) => (
-        <ProductCard key={p.id} product={p} formatPrice={formatPrice} />
+      {products.map((product) => (  // ← antes "p"
+        <ProductCard key={product.id} product={product} formatPrice={formatPrice} />
       ))}
     </div>
   );
@@ -26,22 +26,22 @@ function ProductCard({ product, formatPrice }) {
   return (
     <div className="card">
       <SafeImage
-        src={getStrapiMedia(product.imagen?.url)}
-        alt={product.nombre}
+        src={getStrapiMedia(product.image?.url)}  // ← antes "product.imagen?.url"
+        alt={product.name}  // ← antes "product.nombre"
         className="product-img"
         width={240}
       />
 
       <div className="card-body">
-        <h3>{product.nombre}</h3>
-        <p className="precio">{formatPrice(product.precio)}</p>
+        <h3>{product.name}</h3> 
+        <p className="price">{formatPrice(product.price)}</p>
 
-        {product.descripcion && (
-          <p className="descripcion">{product.descripcion}</p>
+        {product.description && (
+          <p className="description">{product.description}</p>
         )}
 
-        <p className={`stock ${product.disponible ? "ok" : "no"}`}>
-          {product.disponible ? "Disponible" : "Agotado"}
+        <p className={`stock ${product.available ? "ok" : "no"}`}>
+          {product.available ? "Disponible" : "Agotado"}
         </p>
 
         <AddToCart product={product} />

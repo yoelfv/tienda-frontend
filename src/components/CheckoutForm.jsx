@@ -12,10 +12,9 @@ export default function CheckoutForm() {
   const [cart, setCart] = useState([]);
   const { formData, updateField } = useCheckoutForm();
 
-  // 📋 Estado para errores de validación
   const [errors, setErrors] = useState({
-    telefono_envia: "",
-    telefono_recibe: ""
+    senderPhone: "",
+    recipientPhone: ""
   });
 
   useEffect(() => {
@@ -23,40 +22,37 @@ export default function CheckoutForm() {
   }, []);
 
   const total = cart.reduce(
-    (sum, item) => sum + item.precio * item.quantity,
+    (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  // 🔄 Validar teléfono en tiempo real mientras escribe
   const handleChange = (e) => {
-  const { name, value } = e.target;
+    const { name, value } = e.target;
 
-  // 👉 actualizar estado global del hook
-  updateField(e);
+    updateField(e);
 
-  // 👉 validaciones (se quedan igual)
-  if (name === "telefono_envia") {
-    if (value.length > 0 && !validatePhone(value)) {
-      setErrors(prev => ({
-        ...prev,
-        telefono_envia: "❌ Ingresa un número de teléfono válido"
-      }));
-    } else {
-      setErrors(prev => ({ ...prev, telefono_envia: "" }));
+    if (name === "senderPhone") {
+      if (value.length > 0 && !validatePhone(value)) {
+        setErrors(prev => ({
+          ...prev,
+          senderPhone: "❌ Ingresa un número de teléfono válido"
+        }));
+      } else {
+        setErrors(prev => ({ ...prev, senderPhone: "" }));
+      }
     }
-  }
 
-  if (name === "telefono_recibe") {
-    if (value.length > 0 && !validatePhone(value)) {
-      setErrors(prev => ({
-        ...prev,
-        telefono_recibe: "❌ Ingresa un número de teléfono válido"
-      }));
-    } else {
-      setErrors(prev => ({ ...prev, telefono_recibe: "" }));
+    if (name === "recipientPhone") {
+      if (value.length > 0 && !validatePhone(value)) {
+        setErrors(prev => ({
+          ...prev,
+          recipientPhone: "❌ Ingresa un número de teléfono válido"
+        }));
+      } else {
+        setErrors(prev => ({ ...prev, recipientPhone: "" }));
+      }
     }
-  }
-};
+  };
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -74,8 +70,8 @@ export default function CheckoutForm() {
 
     try {
       const config = await getConfiguracion();
-      const targetPhone = config?.telefono_whatsapp || "0000000000";
-      const baseMessage = config?.mensaje_base || "Nuevo pedido:";
+      const targetPhone = config?.whatsapp_phone || config?.telefono_whatsapp || "0000000000";
+      const baseMessage = config?.base_message || config?.mensaje_base || "Nuevo pedido:";
 
       const message = buildWhatsAppMessage(formData, cart, total, config);
 
@@ -103,17 +99,14 @@ export default function CheckoutForm() {
         ← Volver a la tienda
       </button>
 
-      {/* 🛒 RESUMEN */}
       <OrderSummary cart={cart} total={total} />
 
-      {/* 👤 DATOS QUIEN ENVÍA */}
       <SenderForm
         formData={formData}
         handleChange={handleChange}
         errors={errors}
       />
 
-      {/* 📦 DATOS ENTREGA */}
       <DeliveryForm
         formData={formData}
         handleChange={handleChange}

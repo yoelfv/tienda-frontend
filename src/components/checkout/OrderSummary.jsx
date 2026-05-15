@@ -5,8 +5,8 @@ export default function OrderSummary({ cart, total }) {
 
       {cart.map(item => (
         <div key={item.id} className="resumen-item">
-          <span>{item.nombre} x{item.quantity}</span>
-          <span>${item.precio * item.quantity}</span>
+          <span>{item.name} x{item.quantity}</span>
+          <span>${item.price * item.quantity}</span>
         </div>
       ))}
 

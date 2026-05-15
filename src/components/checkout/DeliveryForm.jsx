@@ -9,28 +9,28 @@ export default function DeliveryForm({
     <div className="checkout-section">
       <h3>Datos de entrega</h3>
       <InputField
-        name="nombre_recibe"
-        value={formData.nombre_recibe}
+        name="recipientName"                 
+        value={formData.recipientName}       
         onChange={handleChange}
         placeholder="Nombre y apellidos de quien recibe *"
       />
       <InputField
-        name="telefono_recibe"
-        value={formData.telefono_recibe}
+        name="recipientPhone"                
+        value={formData.recipientPhone}      
         onChange={handleChange}
         placeholder="Teléfono de quien recibe *"
-        error={errors.telefono_recibe}
+        error={errors.recipientPhone}        
       />
       <InputField
-        name="direccion"
-        value={formData.direccion}
+        name="address"                      
+        value={formData.address}            
         onChange={handleChange}
         placeholder="Dirección de entrega *"
       />
       <InputField
         as="textarea"
-        name="nota"
-        value={formData.nota}
+        name="note"                         
+        value={formData.note}               
         onChange={handleChange}
         placeholder="Nota adicional (opcional)"
       />

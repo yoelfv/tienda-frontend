@@ -2,12 +2,12 @@ import { useState } from "react";
 
 export function useCheckoutForm() {
   const [formData, setFormData] = useState({
-    nombre_envia: "",
-    telefono_envia: "",
-    nombre_recibe: "",
-    telefono_recibe: "",
-    direccion: "",
-    nota: ""
+    senderName: "",
+    senderPhone: "",
+    recipientName: "",
+    recipientPhone: "",
+    address: "",
+    note: ""
   });
 
   const updateField = (e) => {

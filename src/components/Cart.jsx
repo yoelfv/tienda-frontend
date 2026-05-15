@@ -22,13 +22,12 @@ export default function Cart() {
 
   const formatPrice = (value) => new Intl.NumberFormat("es-ES").format(value);
 
-  const total = cart.reduce((sum, item) => sum + item.precio * item.quantity, 0);
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <>
-      {/* 🔘 BOTÓN FLOTANTE DEL CARRITO */}
       <button
         className={`cart-fab ${totalItems > 0 ? "has-items" : ""}`}
         onClick={() => setIsOpen(!isOpen)}
@@ -37,7 +36,6 @@ export default function Cart() {
         {totalItems > 0 && <span className="cart-fab-badge">{totalItems}</span>}
       </button>
 
-      {/* 🛒 PANEL LATERAL */}
       <div className={`cart-panel ${isOpen ? "open" : ""}`}>
         <div className="cart-panel-header">
           <h2>🛒 Carrito</h2>
@@ -56,9 +54,9 @@ export default function Cart() {
                   
                   <div className="cart-item-top">
                     <div className="cart-item-info">
-                      <p className="cart-item-name">{item.nombre}</p>
+                      <p className="cart-item-name">{item.name}</p>
                       <p className="cart-item-price">
-                        ${formatPrice(item.precio)}
+                        ${formatPrice(item.price)}
                       </p>
                     </div>
                   </div>
@@ -82,7 +80,7 @@ export default function Cart() {
                   </div>
 
                   <p className="cart-item-subtotal">
-                    Subtotal: ${formatPrice(item.precio * item.quantity)}
+                    Subtotal: ${formatPrice(item.price * item.quantity)}
                   </p>
 
                   <button
@@ -108,7 +106,6 @@ export default function Cart() {
         </div>
       </div>
 
-      {/* OVERLAY */}
       {isOpen && <div className="cart-overlay" onClick={() => setIsOpen(false)} />}
     </>
   );

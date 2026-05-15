@@ -2,49 +2,49 @@ import { useEffect, useRef } from "react";
 import { getStrapiMedia } from "../../services/api";
 
 export default function CategoryBar({
-  categorias,
-  categoriaActiva,
+  categories, 
+  activeCategory,
   onSelect,
 }) {
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
+    const element = scrollRef.current;
+    if (!element) return;
 
-    const handleWheel = (e) => {
-      if (el.scrollWidth <= el.clientWidth) return;
+    const handleWheel = (event) => {
+      if (element.scrollWidth <= element.clientWidth) return;
 
-      e.preventDefault();
-      el.scrollBy({
-        left: e.deltaY * 2,
+      event.preventDefault();
+      element.scrollBy({
+        left: event.deltaY * 2,
       });
     };
 
-    el.addEventListener("wheel", handleWheel, { passive: false });
+    element.addEventListener("wheel", handleWheel, { passive: false });
 
-    return () => el.removeEventListener("wheel", handleWheel);
+    return () => element.removeEventListener("wheel", handleWheel);
   }, []);
 
   return (
     <div className="categories-scroll" ref={scrollRef}>
-      {categorias.map((cat) => (
+      {categories.map((category) => (
         <button
-          key={cat.id}
+          key={category.id}
           className={`cat-chip ${
-            categoriaActiva === cat.slug ? "active" : ""
+            activeCategory === category.slug ? "active" : ""
           }`}
-          onClick={() => onSelect(cat.slug)}
+          onClick={() => onSelect(category.slug)}
         >
-          {cat.imagen?.url ? (
+          {category.image?.url ? (
             <img
-              src={getStrapiMedia(cat.imagen.url)}
+              src={getStrapiMedia(category.image.url)}
               className="cat-chip-img"
             />
           ) : (
             <span className="cat-chip-icon">📦</span>
           )}
-          {cat.nombre}
+          {category.name}
         </button>
       ))}
     </div>

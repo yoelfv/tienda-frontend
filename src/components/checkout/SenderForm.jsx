@@ -9,17 +9,17 @@ export default function SenderForm({
     <div className="checkout-section">
       <h3>Tus datos</h3>
       <InputField
-        name="nombre_envia"
-        value={formData.nombre_envia}
+        name="senderName"                    
+        value={formData.senderName}          
         onChange={handleChange}
         placeholder="Nombre de quien envía *"
       />
       <InputField
-        name="telefono_envia"
-        value={formData.telefono_envia}
+        name="senderPhone"                   
+        value={formData.senderPhone}         
         onChange={handleChange}
         placeholder="Teléfono de quien envía *"
-        error={errors.telefono_envia}
+        error={errors.senderPhone}           
       />
     </div>
   );
