@@ -9,13 +9,13 @@ export default function ProductGrid({ products }) {
       currency: "USD",
     }).format(value);
 
-  if (!products.length) { 
+  if (!products.length) {
     return <p className="no-products">No hay productos en esta categoría</p>;
   }
 
   return (
     <div className="products-grid">
-      {products.map((product) => ( 
+      {products.map((product) => (
         <ProductCard key={product.id} product={product} formatPrice={formatPrice} />
       ))}
     </div>
@@ -26,19 +26,17 @@ function ProductCard({ product, formatPrice }) {
   return (
     <div className="card">
       <SafeImage
-        src={getStrapiMedia(product.image?.url)} 
+        src={getStrapiMedia(product.image?.url)}
         alt={product.name}
         className="product-img"
         width={240}
       />
 
       <div className="card-body">
-        <h3>{product.name}</h3> 
+        <h3>{product.name}</h3>
         <p className="price">{formatPrice(product.price)}</p>
 
-        {product.description && (
-          <p className="description">{product.description}</p>
-        )}
+        {product.description && <p className="description">{product.description}</p>}
 
         <p className={`stock ${product.available ? "ok" : "no"}`}>
           {product.available ? "Disponible" : "Agotado"}

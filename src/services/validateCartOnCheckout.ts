@@ -32,12 +32,12 @@ export async function validateCartOnCheckout(cart: CartItem[]): Promise<Validati
       .filter((item) => !existingIds.has(item.id))
       .map((item) => ({
         id: item.id,
-        name: item.name || item.nombre || "Producto sin nombre"
+        name: item.name || item.nombre || "Producto sin nombre",
       }));
 
     return {
       isValid: missingProducts.length === 0,
-      missingProducts
+      missingProducts,
     };
   } catch (error) {
     console.error("Error validating cart:", error);

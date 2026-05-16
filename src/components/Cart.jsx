@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { getCart, removeFromCart, updateQuantity } from "../store/cart";
 
 export default function Cart() {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    const storedCart = getCart();
+    return Array.isArray(storedCart) ? storedCart : [];
+  });
   const [isOpen, setIsOpen] = useState(false);
 
   const updateCart = () => {
@@ -11,7 +14,6 @@ export default function Cart() {
   };
 
   useEffect(() => {
-    updateCart();
     window.addEventListener("cartUpdated", updateCart);
     window.addEventListener("storage", updateCart);
     return () => {
@@ -49,15 +51,12 @@ export default function Cart() {
             <p className="cart-empty">El carrito está vacío</p>
           ) : (
             <>
-              {cart.map(item => (
+              {cart.map((item) => (
                 <div key={item.id} className="cart-item">
-                  
                   <div className="cart-item-top">
                     <div className="cart-item-info">
                       <p className="cart-item-name">{item.name}</p>
-                      <p className="cart-item-price">
-                        ${formatPrice(item.price)}
-                      </p>
+                      <p className="cart-item-price">${formatPrice(item.price)}</p>
                     </div>
                   </div>
 
@@ -83,10 +82,7 @@ export default function Cart() {
                     Subtotal: ${formatPrice(item.price * item.quantity)}
                   </p>
 
-                  <button
-                    className="remove-btn"
-                    onClick={() => removeFromCart(item.id)}
-                  >
+                  <button className="remove-btn" onClick={() => removeFromCart(item.id)}>
                     Eliminar
                   </button>
                 </div>
@@ -96,7 +92,7 @@ export default function Cart() {
                 <h3>Total: ${formatPrice(total)}</h3>
                 <button
                   className="btn-primary"
-                  onClick={() => window.location.href = "/checkout"}
+                  onClick={() => (window.location.href = "/checkout")}
                 >
                   Finalizar compra
                 </button>

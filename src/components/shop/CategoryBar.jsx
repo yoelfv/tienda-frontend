@@ -1,11 +1,7 @@
 import { useEffect, useRef } from "react";
 import { getStrapiMedia } from "../../services/api";
 
-export default function CategoryBar({
-  categories, 
-  activeCategory,
-  onSelect,
-}) {
+export default function CategoryBar({ categories, activeCategory, onSelect }) {
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -31,16 +27,11 @@ export default function CategoryBar({
       {categories.map((category) => (
         <button
           key={category.id}
-          className={`cat-chip ${
-            activeCategory === category.slug ? "active" : ""
-          }`}
+          className={`cat-chip ${activeCategory === category.slug ? "active" : ""}`}
           onClick={() => onSelect(category.slug)}
         >
           {category.image?.url ? (
-            <img
-              src={getStrapiMedia(category.image.url)}
-              className="cat-chip-img"
-            />
+            <img src={getStrapiMedia(category.image.url)} className="cat-chip-img" />
           ) : (
             <span className="cat-chip-icon">📦</span>
           )}

@@ -22,15 +22,13 @@ export function addToCart(product) {
 
   const cart = getCart();
 
-  const existing = cart.find(item => item.id === product.id);
+  const existing = cart.find((item) => item.id === product.id);
 
   let updatedCart;
 
   if (existing) {
-    updatedCart = cart.map(item =>
-      item.id === product.id
-        ? { ...item, quantity: item.quantity + 1 }
-        : item
+    updatedCart = cart.map((item) =>
+      item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
     );
   } else {
     updatedCart = [...cart, { ...product, quantity: 1 }];
@@ -43,7 +41,7 @@ export function addToCart(product) {
 export function removeFromCart(productId) {
   const cart = getCart();
 
-  const updatedCart = cart.filter(item => item.id !== productId);
+  const updatedCart = cart.filter((item) => item.id !== productId);
 
   saveCart(updatedCart);
   notifyCartChange();
@@ -53,7 +51,7 @@ export function updateQuantity(productId, amount) {
   const cart = getCart();
 
   const updatedCart = cart
-    .map(item => {
+    .map((item) => {
       if (item.id === productId) {
         const newQuantity = item.quantity + amount;
 

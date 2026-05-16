@@ -4,5 +4,5 @@ export interface Product {
   precio: number;
   imagen: {
     url: string;
-  } | null;  // ✅ Explicitamente puede ser null
+  } | null; // ✅ Explicitamente puede ser null
 }

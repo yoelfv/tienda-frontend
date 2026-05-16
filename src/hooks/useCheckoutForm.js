@@ -7,20 +7,20 @@ export function useCheckoutForm() {
     recipientName: "",
     recipientPhone: "",
     address: "",
-    note: ""
+    note: "",
   });
 
   const updateField = (e) => {
-  const { name, value } = e.target;
+    const { name, value } = e.target;
 
-  setFormData(prev => ({
-    ...prev,
-    [name]: value ?? ""
-   }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value ?? "",
+    }));
   };
 
   return {
     formData,
-    updateField
+    updateField,
   };
 }

@@ -1,14 +1,15 @@
 ---
 import "../styles/global.css";
 
-const API_URL: string = import.meta.env.PUBLIC_API_URL || "https://tienda-backend-production-9f16.up.railway.app";
+const API_URL: string =
+  import.meta.env.PUBLIC_API_URL || "https://tienda-backend-production-9f16.up.railway.app";
 
 let nombreTienda: string = "Mi Tienda";
 let logoUrl: string | null = null;
 
 function extraerUrlImagen(imagen: any): string | null {
   if (!imagen) return null;
-  if (typeof imagen === 'string') return imagen;
+  if (typeof imagen === "string") return imagen;
   if (imagen.url) return imagen.url;
   if (imagen.data?.attributes?.url) return imagen.data.attributes.url;
   return null;
@@ -17,7 +18,7 @@ function extraerUrlImagen(imagen: any): string | null {
 try {
   const [resConfig, resCategories] = await Promise.all([
     fetch(`${API_URL}/api/configuracion?populate=*`),
-    fetch(`${API_URL}/api/categorias?populate=*`)
+    fetch(`${API_URL}/api/categorias?populate=*`),
   ]);
 
   if (resConfig.ok) {
@@ -37,20 +38,14 @@ const optimizeImage = (url: string, width: number = 80): string => {
   if (!url) return "";
 
   if (url.includes("/upload/")) {
-    return url.replace(
-      "/upload/",
-      `/upload/f_auto,q_auto,w_${width},c_fill/`
-    );
+    return url.replace("/upload/", `/upload/f_auto,q_auto,w_${width},c_fill/`);
   }
 
   return url;
 };
 
 const finalLogo = logoUrl
-  ? optimizeImage(
-      logoUrl.startsWith("http") ? logoUrl : `${API_URL}${logoUrl}`,
-      100
-    )
+  ? optimizeImage(logoUrl.startsWith("http") ? logoUrl : `${API_URL}${logoUrl}`, 100)
   : "";
 ---
 
@@ -65,24 +60,20 @@ const finalLogo = logoUrl
 
   <body>
     <header class="header" id="main-header">
-
       <div class="header-inner">
         <div class="header-left" id="btn-info-tienda">
-          {logoUrl ? (
-            <img
-              src={finalLogo}
-              alt={nombreTienda}
-              class="header-logo"
-              loading="eager"
-            />
-          ) : (
-            <div
-              class="header-logo"
-              style="background:#2ecc71;display:flex;align-items:center;justify-content:center;font-size:1.5rem;"
-            >
-              🛒
-            </div>
-          )}
+          {
+            logoUrl ? (
+              <img src={finalLogo} alt={nombreTienda} class="header-logo" loading="eager" />
+            ) : (
+              <div
+                class="header-logo"
+                style="background:#2ecc71;display:flex;align-items:center;justify-content:center;font-size:1.5rem;"
+              >
+                🛒
+              </div>
+            )
+          }
           <div class="header-info">
             <h2 class="header-name">{nombreTienda}</h2>
             <p class="header-tagline">Tu tienda de confianza</p>
@@ -90,9 +81,7 @@ const finalLogo = logoUrl
         </div>
 
         <div class="header-right">
-          <button class="btn-about-us" id="btn-about-us">
-            📖 Quiénes Somos
-          </button>
+          <button class="btn-about-us" id="btn-about-us"> 📖 Quiénes Somos </button>
         </div>
       </div>
     </header>
@@ -114,7 +103,8 @@ const finalLogo = logoUrl
 </html>
 
 <script>
-  const API_URL = import.meta.env.PUBLIC_API_URL || "https://tienda-backend-production-9f16.up.railway.app";
+  const API_URL =
+    import.meta.env.PUBLIC_API_URL || "https://tienda-backend-production-9f16.up.railway.app";
 
   interface InfoTienda {
     descripcion: string;
@@ -124,16 +114,16 @@ const finalLogo = logoUrl
   }
 
   function richTextToPlainText(blocks: any[]): string {
-    if (!blocks || !Array.isArray(blocks)) return 'Información no disponible.';
+    if (!blocks || !Array.isArray(blocks)) return "Información no disponible.";
     return blocks
       .map((block: any) => {
         if (block.children && Array.isArray(block.children)) {
-          return block.children.map((child: any) => child.text || '').join('');
+          return block.children.map((child: any) => child.text || "").join("");
         }
-        return '';
+        return "";
       })
-      .filter((text: string) => text.trim() !== '')
-      .join('\n');
+      .filter((text: string) => text.trim() !== "")
+      .join("\n");
   }
 
   async function cargarInfoTienda(): Promise<InfoTienda | null> {
@@ -142,9 +132,9 @@ const finalLogo = logoUrl
       if (res.ok) {
         const data = await res.json();
         const config = data?.data || {};
-        let descripcion = 'Información no disponible.';
+        let descripcion = "Información no disponible.";
         if (config.descripcion_tienda) {
-          if (typeof config.descripcion_tienda === 'string') {
+          if (typeof config.descripcion_tienda === "string") {
             descripcion = config.descripcion_tienda;
           } else if (Array.isArray(config.descripcion_tienda)) {
             descripcion = richTextToPlainText(config.descripcion_tienda);
@@ -152,25 +142,25 @@ const finalLogo = logoUrl
         }
         return {
           descripcion,
-          direccion: config.direccion || 'No especificada',
-          telefono: config.telefono || config.telefono_whatsapp || 'No especificado',
-          email: config.email || 'No especificado',
+          direccion: config.direccion || "No especificada",
+          telefono: config.telefono || config.telefono_whatsapp || "No especificado",
+          email: config.email || "No especificado",
         };
       }
     } catch (e) {
-      console.error('Error cargando info:', e);
+      console.error("Error cargando info:", e);
     }
     return null;
   }
 
   function abrirModal(info: InfoTienda | null): void {
-    const modal = document.getElementById('modal-quienes-somos');
-    const body = document.getElementById('modal-body');
-    const title = document.getElementById('modal-title');
+    const modal = document.getElementById("modal-quienes-somos");
+    const body = document.getElementById("modal-body");
+    const title = document.getElementById("modal-title");
     if (!modal || !body || !title) return;
     if (info) {
-      title.textContent = 'Quiénes Somos';
-      const descripcionHTML = info.descripcion.replace(/\n/g, '<br>');
+      title.textContent = "Quiénes Somos";
+      const descripcionHTML = info.descripcion.replace(/\n/g, "<br>");
       body.innerHTML = `
         <p>${descripcionHTML}</p>
         <div class="modal-contact">
@@ -180,29 +170,29 @@ const finalLogo = logoUrl
         </div>
       `;
     } else {
-      body.textContent = 'No se pudo cargar la información.';
+      body.textContent = "No se pudo cargar la información.";
     }
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
   }
 
   function cerrarModal(): void {
-    const modal = document.getElementById('modal-quienes-somos');
-    if (modal) modal.style.display = 'none';
-    document.body.style.overflow = '';
+    const modal = document.getElementById("modal-quienes-somos");
+    if (modal) modal.style.display = "none";
+    document.body.style.overflow = "";
   }
 
-  document.getElementById('btn-about-us')?.addEventListener('click', async () => {
+  document.getElementById("btn-about-us")?.addEventListener("click", async () => {
     abrirModal(await cargarInfoTienda());
   });
 
-  document.getElementById('btn-info-tienda')?.addEventListener('click', async () => {
+  document.getElementById("btn-info-tienda")?.addEventListener("click", async () => {
     abrirModal(await cargarInfoTienda());
   });
 
-  document.getElementById('modal-close')?.addEventListener('click', cerrarModal);
+  document.getElementById("modal-close")?.addEventListener("click", cerrarModal);
 
-  document.getElementById('modal-quienes-somos')?.addEventListener('click', (e) => {
+  document.getElementById("modal-quienes-somos")?.addEventListener("click", (e) => {
     if (e.target === e.currentTarget) cerrarModal();
   });
 

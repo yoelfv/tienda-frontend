@@ -75,9 +75,7 @@ export async function getProducts(): Promise<Product[]> {
 
     if (product.descripcion && Array.isArray(product.descripcion)) {
       descriptionText = product.descripcion
-        .map((block: any) =>
-          block.children?.map((child: any) => child.text).join("")
-        )
+        .map((block: any) => block.children?.map((child: any) => child.text).join(""))
         .join("\n");
     }
 
@@ -134,10 +132,7 @@ export async function getCategories(): Promise<Category[]> {
     .map((cat: any) => {
       const name = cat.nombre || cat.attributes?.nombre || "Sin nombre";
 
-      const slug =
-        cat.slug ||
-        cat.attributes?.slug ||
-        name.toLowerCase().replace(/\s+/g, "-");
+      const slug = cat.slug || cat.attributes?.slug || name.toLowerCase().replace(/\s+/g, "-");
 
       let imageUrl = null;
 

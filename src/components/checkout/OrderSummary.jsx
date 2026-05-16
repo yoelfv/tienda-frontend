@@ -3,9 +3,11 @@ export default function OrderSummary({ cart, total }) {
     <div className="checkout-section">
       <h3>Resumen del pedido</h3>
 
-      {cart.map(item => (
+      {cart.map((item) => (
         <div key={item.id} className="resumen-item">
-          <span>{item.name} x{item.quantity}</span>
+          <span>
+            {item.name} x{item.quantity}
+          </span>
           <span>${item.price * item.quantity}</span>
         </div>
       ))}

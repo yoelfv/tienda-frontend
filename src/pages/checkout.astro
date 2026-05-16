@@ -5,19 +5,16 @@ import CheckoutForm from "../components/CheckoutForm.jsx";
 
 <Layout title="Finalizar pedido">
   <div class="checkout-page">
-
     <h1>🧾 Finalizar pedido</h1>
-      <p class="checkout-step">
-        Paso 1: Revisa tu pedido → Paso 2: Completa datos → Paso 3: Confirma por WhatsApp
+    <p class="checkout-step">
+      Paso 1: Revisa tu pedido → Paso 2: Completa datos → Paso 3: Confirma por WhatsApp
     </p>
     <p class="checkout-info">
-      Completa tus datos para procesar el pedido.  
-      Serás redirigido a WhatsApp para confirmarlo.
+      Completa tus datos para procesar el pedido. Serás redirigido a WhatsApp para confirmarlo.
     </p>
 
     <div class="checkout-box">
       <CheckoutForm client:load />
     </div>
-
   </div>
 </Layout>

@@ -1,11 +1,4 @@
-export default function InputField({
-  name,
-  value,
-  onChange,
-  placeholder,
-  error,
-  as = "input"
-}) {
+export default function InputField({ name, value, onChange, placeholder, error, as = "input" }) {
   const Component = as;
 
   return (
@@ -18,11 +11,7 @@ export default function InputField({
         className={error ? "input-error" : ""}
       />
 
-      {error && (
-        <span className="error-message">
-          {error}
-        </span>
-      )}
+      {error && <span className="error-message">{error}</span>}
     </>
   );
 }

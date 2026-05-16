@@ -13,7 +13,7 @@ export default function AddToCart({ product }) {
     }
 
     const cart = getCart();
-    const existing = cart.find(item => item.id === product.id);
+    const existing = cart.find((item) => item.id === product.id);
 
     if (existing && existing.quantity >= 10) {
       alert("Has alcanzado el máximo de 10 unidades para este producto");
@@ -32,11 +32,7 @@ export default function AddToCart({ product }) {
       onClick={handleAdd}
       disabled={!product?.available}
     >
-      {!product?.available
-        ? "Agotado"
-        : added
-        ? "✔ Añadido"
-        : "Añadir al carrito"}
+      {!product?.available ? "Agotado" : added ? "✔ Añadido" : "Añadir al carrito"}
     </button>
   );
 }
