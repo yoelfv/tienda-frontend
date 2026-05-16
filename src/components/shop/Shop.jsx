@@ -18,7 +18,7 @@ export default function Shop() {
         setHeaderHeight(header.offsetHeight);
       }
     }, 0);
-    
+
     return () => clearTimeout(timer);
   }, []);
 
