@@ -15,7 +15,49 @@ export function getStrapiMedia(url: string | null | undefined): string {
   return `${STRAPI_URL}${url}`;
 }
 
-export async function getProductos() {
+// ============================================
+// 📦 INTERFACES
+// ============================================
+
+export interface ProductImage {
+  url: string;
+}
+
+export interface Product {
+  id: number;
+  name: string;
+  price: number;
+  available: boolean;
+  description: string;
+  image: ProductImage | null;
+  category: any | null;
+}
+
+export interface CategoryImage {
+  url: string;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  image: CategoryImage | null;
+}
+
+export interface Config {
+  id?: number;
+  whatsapp_phone?: string;
+  telefono_whatsapp?: string;
+  base_message?: string;
+  mensaje_base?: string;
+  [key: string]: any;
+}
+
+// ============================================
+// 📦 PRODUCTS
+// ============================================
+
+export async function getProducts(): Promise<Product[]> {
   const res = await fetch(`${getApiUrl()}/products?populate=*`, {
     cache: "no-store",
   });
@@ -23,16 +65,16 @@ export async function getProductos() {
   if (!res.ok) {
     const errorText = await res.text();
     console.error("Error API products:", res.status, errorText);
-    throw new Error(`Error ${res.status}: fallo al obtener productos`);
+    throw new Error(`Error ${res.status}: failed to fetch products`);
   }
 
   const data = await res.json();
 
-  return (data.data || []).map((producto: any) => {
-    let descriptionText = "";  
+  return (data.data || []).map((product: any) => {
+    let descriptionText = "";
 
-    if (producto.descripcion && Array.isArray(producto.descripcion)) {
-      descriptionText = producto.descripcion
+    if (product.descripcion && Array.isArray(product.descripcion)) {
+      descriptionText = product.descripcion
         .map((block: any) =>
           block.children?.map((child: any) => child.text).join("")
         )
@@ -40,41 +82,49 @@ export async function getProductos() {
     }
 
     return {
-      id: producto.id,
-      name: producto.nombre,           
-      price: producto.precio,          
-      available: producto.disponible,  
-      description: descriptionText,    
-      image: producto.imagen?.url ? { url: producto.imagen.url } : null,  
-      category: producto.categoria || null,
+      id: product.id,
+      name: product.nombre,
+      price: product.precio,
+      available: product.disponible,
+      description: descriptionText,
+      image: product.imagen?.url ? { url: product.imagen.url } : null,
+      category: product.categoria || null,
     };
   });
 }
 
-export async function getConfiguracion() {
+// ============================================
+// ⚙️ CONFIG
+// ============================================
+
+export async function getConfig(): Promise<Config> {
   const res = await fetch(`${getApiUrl()}/configuracion`, {
     cache: "no-store",
   });
 
   if (!res.ok) {
     const errorText = await res.text();
-    console.error("Error API configuración:", res.status, errorText);
-    throw new Error(`Error ${res.status}: fallo al obtener configuración`);
+    console.error("Error API config:", res.status, errorText);
+    throw new Error(`Error ${res.status}: failed to fetch config`);
   }
 
   const data = await res.json();
   return data.data || {};
 }
 
-export async function getCategorias() {
+// ============================================
+// 🗂️ CATEGORIES
+// ============================================
+
+export async function getCategories(): Promise<Category[]> {
   const res = await fetch(`${getApiUrl()}/categorias?populate=*`, {
     cache: "no-store",
   });
 
   if (!res.ok) {
     const errorText = await res.text();
-    console.error("Error API categorías:", res.status, errorText);
-    throw new Error(`Error ${res.status}: fallo al obtener categorías`);
+    console.error("Error API categories:", res.status, errorText);
+    throw new Error(`Error ${res.status}: failed to fetch categories`);
   }
 
   const response = await res.json();
@@ -82,15 +132,14 @@ export async function getCategorias() {
 
   return categoriesData
     .map((cat: any) => {
-      const name =  
-        cat.nombre || cat.attributes?.nombre || "Sin nombre";
+      const name = cat.nombre || cat.attributes?.nombre || "Sin nombre";
 
       const slug =
         cat.slug ||
         cat.attributes?.slug ||
         name.toLowerCase().replace(/\s+/g, "-");
 
-      let imageUrl = null;  // ← antes "imagenUrl"
+      let imageUrl = null;
 
       if (cat.imagen?.url) {
         imageUrl = cat.imagen.url;
@@ -102,12 +151,10 @@ export async function getCategorias() {
 
       return {
         id: cat.id,
-        name,                    // ← antes "nombre"
+        name,
         slug,
-        image: imageUrl ? { url: imageUrl } : null,  // ← antes "imagen"
+        image: imageUrl ? { url: imageUrl } : null,
       };
     })
-    .sort((a: any, b: any) =>
-      a.name.localeCompare(b.name, "es")  // ← actualizado
-    );
+    .sort((a: Category, b: Category) => a.name.localeCompare(b.name, "es"));
 }

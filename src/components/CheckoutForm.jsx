@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { getCart } from "../store/cart";
-import { getConfiguracion } from "../services/api";
+import { getConfig } from "../services/api";
 import { useCheckoutForm } from "../hooks/useCheckoutForm";
 import { validatePhone, validateCheckout } from "../utils/checkoutValidators";
 import { buildWhatsAppMessage } from "../utils/buildWhatsAppMessage";
+import { validateCartOnCheckout } from "../services/validateCartOnCheckout";
 import OrderSummary from "./checkout/OrderSummary";
 import SenderForm from "./checkout/SenderForm";
 import DeliveryForm from "./checkout/DeliveryForm";
@@ -59,6 +60,27 @@ export default function CheckoutForm() {
   const submitOrder = async () => {
     if (isLoading) return;
 
+    const { isValid, missingProducts } = await validateCartOnCheckout(cart);
+
+    if (!isValid) {
+      const productNames = missingProducts.map(p => `• ${p.name}`).join("\n");
+      
+      const userConfirmed = window.confirm(
+        `⚠️ Los siguientes productos ya no están disponibles:\n\n${productNames}\n\n¿Deseas continuar sin estos productos?`
+      );
+      
+      if (userConfirmed) {
+        const validCart = cart.filter(
+          item => !missingProducts.some(mp => mp.id === item.id)
+        );
+        
+        localStorage.setItem("cart", JSON.stringify(validCart));
+        window.dispatchEvent(new Event("cartUpdated"));
+        window.location.reload();
+      }
+      return;
+    }
+
     const error = validateCheckout(formData, cart);
 
     if (error) {
@@ -69,7 +91,7 @@ export default function CheckoutForm() {
     setIsLoading(true);
 
     try {
-      const config = await getConfiguracion();
+      const config = await getConfig();
       const targetPhone = config?.whatsapp_phone || config?.telefono_whatsapp || "0000000000";
       const baseMessage = config?.base_message || config?.mensaje_base || "Nuevo pedido:";
 

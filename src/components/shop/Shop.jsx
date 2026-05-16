@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { getProductos, getCategorias } from "../../services/api";
+import { getProducts, getCategories } from "../../services/api";
 
 import CategoryBar from "./CategoryBar";
 import ProductGrid from "./ProductGrid";
 
 export default function Shop() {
-  const [products, setProducts] = useState([]);        // ← antes "productos"
-  const [categories, setCategories] = useState([]);    // ← antes "categorias"
-  const [activeCategory, setActiveCategory] = useState(null); // ← antes "categoriaActiva"
+  const [products, setProducts] = useState([]);        
+  const [categories, setCategories] = useState([]);    
+  const [activeCategory, setActiveCategory] = useState(null); 
   const [loading, setLoading] = useState(true);
   const [headerHeight, setHeaderHeight] = useState(0);
 
@@ -19,23 +19,23 @@ export default function Shop() {
   }, []);
 
   useEffect(() => {
-    Promise.all([getProductos(), getCategorias()])
+    Promise.all([getProducts(), getCategories()])
       .then(([prods, cats]) => {
         const sortedCats = [...cats].sort((a, b) =>
           a.name.localeCompare(b.name, "es")
         );
 
-        setProducts(prods);           // ← actualizado
-        setCategories(sortedCats);    // ← actualizado
+        setProducts(prods);           
+        setCategories(sortedCats);    
 
         if (sortedCats.length > 0) {
-          setActiveCategory(sortedCats[0].slug);  // ← actualizado
+          setActiveCategory(sortedCats[0].slug);  
         }
       })
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading || activeCategory === null) {   // ← actualizado
+  if (loading || activeCategory === null) {  
     return (
       <div className="loading-container">
         <div className="spinner"></div>
@@ -44,8 +44,8 @@ export default function Shop() {
     );
   }
 
-  const filteredProducts = products.filter(   // ← actualizado
-    (product) => product.category?.slug === activeCategory  // ← actualizado
+  const filteredProducts = products.filter(  
+    (product) => product.category?.slug === activeCategory 
   );
 
   return (
@@ -55,9 +55,9 @@ export default function Shop() {
         style={{ top: `${headerHeight}px` }}
       >
         <CategoryBar
-          categories={categories}           // ← antes "categorias"
-          activeCategory={activeCategory}   // ← antes "categoriaActiva"
-          onSelect={setActiveCategory}      // ← antes "setCategoriaActiva"
+          categories={categories}           
+          activeCategory={activeCategory}   
+          onSelect={setActiveCategory}      
         />
       </div>
 
@@ -67,7 +67,7 @@ export default function Shop() {
           paddingTop: `${headerHeight}px`
         }}
       >
-        <ProductGrid products={filteredProducts} />  {/* ← "productosFiltrados" → "filteredProducts" */}
+        <ProductGrid products={filteredProducts} />  
       </div>
     </>
   );
