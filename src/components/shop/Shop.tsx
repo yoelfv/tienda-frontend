@@ -1,46 +1,30 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 
-import {
-  getProducts,
-  getCategories,
-} from "../../services/api";
+import { getProducts, getCategories } from "@/services/api";
 
 import CategoryBar from "./CategoryBar";
 import ProductGrid from "./ProductGrid";
 
-import type { Product } from "../../types/product";
-import type { Category } from "../../types/category";
+import type { Product } from "@/types/product";
+import type { Category } from "@/types/category";
 
 export default function Shop() {
-  const [products, setProducts] =
-    useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
 
-  const [categories, setCategories] =
-    useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
-  const [
-    activeCategory,
-    setActiveCategory,
-  ] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const [loading, setLoading] =
-    useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const [headerHeight, setHeaderHeight] =
-    useState<number>(0);
+  const [headerHeight, setHeaderHeight] = useState<number>(0);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      const header =
-        document.querySelector(".header");
+      const header = document.querySelector(".header");
 
       if (header instanceof HTMLElement) {
-        setHeaderHeight(
-          header.offsetHeight,
-        );
+        setHeaderHeight(header.offsetHeight);
       }
     }, 0);
 
@@ -48,54 +32,31 @@ export default function Shop() {
   }, []);
 
   useEffect(() => {
-    Promise.all([
-      getProducts(),
-      getCategories(),
-    ])
+    Promise.all([getProducts(), getCategories()])
       .then(([prods, cats]) => {
-        const sortedCats = [...cats].sort(
-          (a, b) =>
-            a.name.localeCompare(
-              b.name,
-              "es",
-            ),
-        );
+        const sortedCats = [...cats].sort((a, b) => a.name.localeCompare(b.name, "es"));
 
         setProducts(prods);
         setCategories(sortedCats);
 
         if (sortedCats.length > 0) {
-          setActiveCategory(
-            sortedCats[0].slug,
-          );
+          setActiveCategory(sortedCats[0].slug);
         }
       })
-      .finally(() =>
-        setLoading(false),
-      );
+      .finally(() => setLoading(false));
   }, []);
 
-  if (
-    loading ||
-    activeCategory === null
-  ) {
+  if (loading || activeCategory === null) {
     return (
       <div className="loading-container">
         <div className="spinner" />
 
-        <p className="loading-text">
-          Cargando tienda...
-        </p>
+        <p className="loading-text">Cargando tienda...</p>
       </div>
     );
   }
 
-  const filteredProducts =
-    products.filter(
-      (product) =>
-        product.category?.slug ===
-        activeCategory,
-    );
+  const filteredProducts = products.filter((product) => product.category?.slug === activeCategory);
 
   return (
     <>
@@ -107,12 +68,8 @@ export default function Shop() {
       >
         <CategoryBar
           categories={categories}
-          activeCategory={
-            activeCategory
-          }
-          onSelect={
-            setActiveCategory
-          }
+          activeCategory={activeCategory}
+          onSelect={setActiveCategory}
         />
       </div>
 
@@ -122,11 +79,7 @@ export default function Shop() {
           paddingTop: `${headerHeight}px`,
         }}
       >
-        <ProductGrid
-          products={
-            filteredProducts
-          }
-        />
+        <ProductGrid products={filteredProducts} />
       </div>
     </>
   );

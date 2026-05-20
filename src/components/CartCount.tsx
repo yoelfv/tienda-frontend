@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getCart } from "../store/cart";
+import { getCart } from "@/store/cart";
 
 export default function CartCount() {
   const [count, setCount] = useState<number>(() => {

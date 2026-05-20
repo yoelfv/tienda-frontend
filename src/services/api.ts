@@ -1,11 +1,13 @@
-import type { Product } from "../types/product";
+import type { Product } from "@/types/product";
 import type {
   StrapiProduct,
   StrapiCategory,
   StrapiDescriptionBlock,
   StrapiDescriptionChild,
   StrapiConfig,
-} from "../types/strapi";
+} from "@/types/strapi";
+
+import type { Category } from "@/types/category";
 
 const STRAPI_URL = import.meta.env.PUBLIC_STRAPI_URL?.trim() || "";
 const API_URL = STRAPI_URL ? `${STRAPI_URL}/api` : "";
@@ -16,6 +18,10 @@ function getApiUrl(): string {
   }
   return API_URL;
 }
+
+// ============================================
+// 🧠 MEDIA HELPER
+// ============================================
 
 export function getStrapiMedia(
   url: string | null | undefined,
@@ -36,7 +42,7 @@ export function getStrapiMedia(
 }
 
 // ============================================
-// 🧠 HELPERS (clean parsing layer)
+// 🧠 PARSER
 // ============================================
 
 function parseRichText(
@@ -53,12 +59,16 @@ function parseRichText(
     .join("\n");
 }
 
+// ============================================
+// 📦 PRODUCT NORMALIZER
+// ============================================
+
 function normalizeProduct(product: StrapiProduct): Product {
   return {
     id: product.id,
     name: product.nombre,
     price: product.precio,
-    available: product.disponible,
+    available: product.disponible ?? false,
     description: parseRichText(product.descripcion),
     image: product.imagen?.url
       ? { url: product.imagen.url }
@@ -68,7 +78,9 @@ function normalizeProduct(product: StrapiProduct): Product {
           id: product.categoria.id,
           name: product.categoria.nombre,
           slug: product.categoria.slug,
-          image: null,
+          image: product.categoria.imagen?.url
+            ? { url: product.categoria.imagen.url }
+            : null,
         }
       : null,
   };
@@ -120,24 +132,24 @@ export async function getConfig(): Promise<StrapiConfig> {
 // 🗂️ CATEGORIES
 // ============================================
 
-function normalizeCategory(cat: StrapiCategory) {
+function normalizeCategory(cat: StrapiCategory): Category {
   const name = cat.nombre ?? "Sin nombre";
 
   const slug =
     cat.slug ??
     name.toLowerCase().replace(/\s+/g, "-");
 
-  const imageUrl = cat.imagen?.url ?? null;
-
   return {
     id: cat.id,
     name,
     slug,
-    image: imageUrl ? { url: imageUrl } : null,
+    image: cat.imagen?.url
+      ? { url: cat.imagen.url }
+      : null,
   };
 }
 
-export async function getCategories() {
+export async function getCategories(): Promise<Category[]> {
   const res = await fetch(`${getApiUrl()}/categorias?populate=*`, {
     cache: "no-store",
   });

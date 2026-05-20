@@ -1,11 +1,8 @@
-import {
-  useEffect,
-  useRef,
-} from "react";
+import { useEffect, useRef } from "react";
 
-import { getStrapiMedia } from "../../services/api";
+import { getStrapiMedia } from "@/services/api";
 
-import type { Category } from "../../types/category";
+import type { Category } from "@/types/category";
 
 type CategoryBarProps = {
   categories: Category[];
@@ -13,26 +10,16 @@ type CategoryBarProps = {
   onSelect: (slug: string) => void;
 };
 
-export default function CategoryBar({
-  categories,
-  activeCategory,
-  onSelect,
-}: CategoryBarProps) {
-  const scrollRef =
-    useRef<HTMLDivElement | null>(null);
+export default function CategoryBar({ categories, activeCategory, onSelect }: CategoryBarProps) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const element = scrollRef.current;
 
     if (!element) return;
 
-    const handleWheel = (
-      event: WheelEvent,
-    ): void => {
-      if (
-        element.scrollWidth <=
-        element.clientWidth
-      ) {
+    const handleWheel = (event: WheelEvent): void => {
+      if (element.scrollWidth <= element.clientWidth) {
         return;
       }
 
@@ -43,52 +30,31 @@ export default function CategoryBar({
       });
     };
 
-    element.addEventListener(
-      "wheel",
-      handleWheel,
-      {
-        passive: false,
-      },
-    );
+    element.addEventListener("wheel", handleWheel, {
+      passive: false,
+    });
 
     return () => {
-      element.removeEventListener(
-        "wheel",
-        handleWheel,
-      );
+      element.removeEventListener("wheel", handleWheel);
     };
   }, []);
 
   return (
-    <div
-      className="categories-scroll"
-      ref={scrollRef}
-    >
+    <div className="categories-scroll" ref={scrollRef}>
       {categories.map((category) => (
         <button
           key={category.id}
-          className={`cat-chip ${
-            activeCategory ===
-            category.slug
-              ? "active"
-              : ""
-          }`}
-          onClick={() =>
-            onSelect(category.slug)
-          }
+          className={`cat-chip ${activeCategory === category.slug ? "active" : ""}`}
+          onClick={() => onSelect(category.slug)}
         >
           {category.image?.url ? (
             <img
-              src={getStrapiMedia(
-                category.image.url,
-              )}
+              src={getStrapiMedia(category.image.url)}
               className="cat-chip-img"
               alt={category.name}
             />
           ) : (
-            <span className="cat-chip-icon">
-              📦
-            </span>
+            <span className="cat-chip-icon">📦</span>
           )}
 
           {category.name}

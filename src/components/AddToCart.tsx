@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { addToCart, getCart } from "../store/cart";
-import type { Product } from "../types/product";
+import { addToCart, getCart } from "@/store/cart";
+import type { Product } from "@/types/product";
 
 interface AddToCartProps {
   product: Product;

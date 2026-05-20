@@ -1,24 +1,18 @@
 import type { ChangeEvent } from "react";
 
-import InputField from "../ui/InputField";
-import type { CheckoutFormData } from "../../types/checkout";
+import InputField from "@/components/ui/InputField";
+import type { CheckoutFormData } from "@/types/checkout";
 
 type DeliveryFormProps = {
   formData: CheckoutFormData;
-  handleChange: (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => void;
+  handleChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   errors: {
     senderPhone: string;
     recipientPhone: string;
   };
 };
 
-export default function DeliveryForm({
-  formData,
-  handleChange,
-  errors,
-}: DeliveryFormProps) {
+export default function DeliveryForm({ formData, handleChange, errors }: DeliveryFormProps) {
   return (
     <div className="checkout-section">
       <h3>Datos de entrega</h3>

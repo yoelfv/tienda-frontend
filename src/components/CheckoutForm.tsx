@@ -1,13 +1,13 @@
 import { useState } from "react";
 import type { ChangeEvent } from "react";
 
-import { getCart } from "../store/cart";
-import { getConfig } from "../services/api";
-import { useCheckoutForm } from "../hooks/useCheckoutForm";
+import { getCart } from "@/store/cart";
+import { getConfig } from "@/services/api";
+import { useCheckoutForm } from "@/hooks/useCheckoutForm";
 
-import { validatePhone, validateCheckout } from "../utils/checkoutValidators";
-import { buildWhatsAppMessage } from "../utils/buildWhatsAppMessage";
-import { validateCartOnCheckout } from "../services/validateCartOnCheckout";
+import { validatePhone, validateCheckout } from "@/utils/checkoutValidators";
+import { buildWhatsAppMessage } from "@/utils/buildWhatsAppMessage";
+import { validateCartOnCheckout } from "@/services/validateCartOnCheckout";
 
 import OrderSummary from "./checkout/OrderSummary";
 import SenderForm from "./checkout/SenderForm";
@@ -29,10 +29,7 @@ export default function CheckoutForm() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const total = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -69,28 +66,19 @@ export default function CheckoutForm() {
   const submitOrder = async () => {
     if (isLoading) return;
 
-    const { isValid, missingProducts } =
-      await validateCartOnCheckout(cart);
+    const { isValid, missingProducts } = await validateCartOnCheckout(cart);
 
     if (!isValid) {
-      const productNames = missingProducts
-        .map((p) => `• ${p.name}`)
-        .join("\n");
+      const productNames = missingProducts.map((p) => `• ${p.name}`).join("\n");
 
       const userConfirmed = window.confirm(
-        `⚠️ Los siguientes productos ya no están disponibles:\n\n${productNames}\n\n¿Deseas continuar sin estos productos?`,
+        `⚠️ Los siguientes productos ya no están disponibles:\n\n${productNames}\n\n¿Deseas continuar sin estos productos?`
       );
 
       if (userConfirmed) {
-        const validCart = cart.filter(
-          (item) =>
-            !missingProducts.some((mp) => mp.id === item.id),
-        );
+        const validCart = cart.filter((item) => !missingProducts.some((mp) => mp.id === item.id));
 
-        localStorage.setItem(
-          "cart",
-          JSON.stringify(validCart),
-        );
+        localStorage.setItem("cart", JSON.stringify(validCart));
 
         window.dispatchEvent(new Event("cartUpdated"));
         window.location.reload();
@@ -111,25 +99,13 @@ export default function CheckoutForm() {
     try {
       const config = await getConfig();
 
-      const targetPhone =
-        config?.whatsapp_phone ||
-        config?.telefono_whatsapp ||
-        "0000000000";
+      const targetPhone = config?.whatsapp_phone || config?.telefono_whatsapp || "0000000000";
 
-      const message = buildWhatsAppMessage(
-        formData,
-        cart,
-        total,
-        config,
-      );
+      const message = buildWhatsAppMessage(formData, cart, total, config);
 
       const whatsappUrl = `https://wa.me/${targetPhone}?text=${message}`;
 
-      window.open(
-        whatsappUrl,
-        "_blank",
-        "noopener,noreferrer",
-      );
+      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
 
       localStorage.removeItem("cart");
       window.dispatchEvent(new Event("cartUpdated"));
@@ -145,32 +121,17 @@ export default function CheckoutForm() {
 
   return (
     <div className="checkout-container">
-      <button
-        className="btn-back"
-        onClick={() => (window.location.href = "/")}
-      >
+      <button className="btn-back" onClick={() => (window.location.href = "/")}>
         ← Volver a la tienda
       </button>
 
       <OrderSummary cart={cart} total={total} />
 
-      <SenderForm
-        formData={formData}
-        handleChange={handleChange}
-        errors={errors}
-      />
+      <SenderForm formData={formData} handleChange={handleChange} errors={errors} />
 
-      <DeliveryForm
-        formData={formData}
-        handleChange={handleChange}
-        errors={errors}
-      />
+      <DeliveryForm formData={formData} handleChange={handleChange} errors={errors} />
 
-      <button
-        className="btn-primary"
-        onClick={submitOrder}
-        disabled={isLoading}
-      >
+      <button className="btn-primary" onClick={submitOrder} disabled={isLoading}>
         {isLoading ? "Enviando..." : "Enviar pedido por WhatsApp"}
       </button>
     </div>

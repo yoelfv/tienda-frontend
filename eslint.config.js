@@ -19,9 +19,12 @@ export default [
       "react-hooks": reactHooksPlugin,
     },
     languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
       globals: {
         ...globals.browser,
         ...globals.node,
+        URL: "readonly",
       },
       parser: tseslint.parser,
       parserOptions: {
@@ -50,6 +53,11 @@ export default [
       react: {
         version: "detect",
       },
+      "import/resolver": {
+        typescript: {
+          project: "./tsconfig.json"
+        }
+      }
     },
   },
 

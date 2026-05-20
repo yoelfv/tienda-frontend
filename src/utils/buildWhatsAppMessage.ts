@@ -1,17 +1,14 @@
-import type { CartItem } from "../types/product";
-import type { CheckoutFormData } from "../types/checkout";
-import type { Config } from "../types/config";
+import type { CartItem } from "@/types/product";
+import type { CheckoutFormData } from "@/types/checkout";
+import type { Config } from "@/types/config";
 
 export function buildWhatsAppMessage(
   formData: CheckoutFormData,
   cart: CartItem[],
   total: number,
-  config: Config,
+  config: Config
 ): string {
-  const baseMessage =
-    config?.base_message ||
-    config?.mensaje_base ||
-    "Nuevo pedido:";
+  const baseMessage = config?.base_message || config?.mensaje_base || "Nuevo pedido:";
 
   let message = `${baseMessage}\n\n`;
 
@@ -27,9 +24,7 @@ export function buildWhatsAppMessage(
   message += `🛒 PRODUCTOS:\n`;
 
   cart.forEach((item) => {
-    message += `• ${item.name} x${item.quantity} = $${
-      item.price * item.quantity
-    }\n`;
+    message += `• ${item.name} x${item.quantity} = $${item.price * item.quantity}\n`;
   });
 
   message += `💵 Total: $${total}\n\n`;

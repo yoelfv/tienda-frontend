@@ -3,8 +3,8 @@ import {
   getCart,
   removeFromCart,
   updateQuantity,
-} from "../store/cart";
-import type { CartItem } from "../types/product";
+} from "@/store/cart";
+import type { CartItem } from "@/types/product";
 
 export default function Cart() {
   const [cart, setCart] = useState<CartItem[]>(() => {
