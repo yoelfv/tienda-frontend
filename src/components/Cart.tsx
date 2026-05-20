@@ -1,32 +1,48 @@
 import { useEffect, useState } from "react";
-import { getCart, removeFromCart, updateQuantity } from "../store/cart";
+import {
+  getCart,
+  removeFromCart,
+  updateQuantity,
+} from "../store/cart";
+import type { CartItem } from "../types/product";
 
 export default function Cart() {
-  const [cart, setCart] = useState(() => {
+  const [cart, setCart] = useState<CartItem[]>(() => {
     const storedCart = getCart();
+
     return Array.isArray(storedCart) ? storedCart : [];
   });
-  const [isOpen, setIsOpen] = useState(false);
 
-  const updateCart = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const updateCart = (): void => {
     const storedCart = getCart();
+
     setCart(Array.isArray(storedCart) ? storedCart : []);
   };
 
   useEffect(() => {
     window.addEventListener("cartUpdated", updateCart);
     window.addEventListener("storage", updateCart);
+
     return () => {
       window.removeEventListener("cartUpdated", updateCart);
       window.removeEventListener("storage", updateCart);
     };
   }, []);
 
-  const formatPrice = (value) => new Intl.NumberFormat("es-ES").format(value);
+  const formatPrice = (value: number): string =>
+    new Intl.NumberFormat("es-ES").format(value);
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
 
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems = cart.reduce(
+    (sum, item) => sum + item.quantity,
+    0,
+  );
 
   return (
     <>
@@ -35,13 +51,20 @@ export default function Cart() {
         onClick={() => setIsOpen(!isOpen)}
       >
         🛒
-        {totalItems > 0 && <span className="cart-fab-badge">{totalItems}</span>}
+        {totalItems > 0 && (
+          <span className="cart-fab-badge">
+            {totalItems}
+          </span>
+        )}
       </button>
 
       <div className={`cart-panel ${isOpen ? "open" : ""}`}>
         <div className="cart-panel-header">
           <h2>🛒 Carrito</h2>
-          <button className="cart-close" onClick={() => setIsOpen(false)}>
+          <button
+            className="cart-close"
+            onClick={() => setIsOpen(false)}
+          >
             ✕
           </button>
         </div>
@@ -55,14 +78,21 @@ export default function Cart() {
                 <div key={item.id} className="cart-item">
                   <div className="cart-item-top">
                     <div className="cart-item-info">
-                      <p className="cart-item-name">{item.name}</p>
-                      <p className="cart-item-price">${formatPrice(item.price)}</p>
+                      <p className="cart-item-name">
+                        {item.name}
+                      </p>
+
+                      <p className="cart-item-price">
+                        ${formatPrice(item.price)}
+                      </p>
                     </div>
                   </div>
 
                   <div className="qty-controls">
                     <button
-                      onClick={() => updateQuantity(item.id, -1)}
+                      onClick={() =>
+                        updateQuantity(item.id, -1)
+                      }
                       disabled={item.quantity <= 1}
                     >
                       −
@@ -71,7 +101,9 @@ export default function Cart() {
                     <span>{item.quantity}</span>
 
                     <button
-                      onClick={() => updateQuantity(item.id, 1)}
+                      onClick={() =>
+                        updateQuantity(item.id, 1)
+                      }
                       disabled={item.quantity >= 10}
                     >
                       +
@@ -79,20 +111,34 @@ export default function Cart() {
                   </div>
 
                   <p className="cart-item-subtotal">
-                    Subtotal: ${formatPrice(item.price * item.quantity)}
+                    Subtotal: $
+                    {formatPrice(
+                      item.price * item.quantity,
+                    )}
                   </p>
 
-                  <button className="remove-btn" onClick={() => removeFromCart(item.id)}>
+                  <button
+                    className="remove-btn"
+                    onClick={() =>
+                      removeFromCart(item.id)
+                    }
+                  >
                     Eliminar
                   </button>
                 </div>
               ))}
 
               <div className="cart-footer">
-                <h3>Total: ${formatPrice(total)}</h3>
+                <h3>
+                  Total: ${formatPrice(total)}
+                </h3>
+
                 <button
                   className="btn-primary"
-                  onClick={() => (window.location.href = "/checkout")}
+                  onClick={() =>
+                    (window.location.href =
+                      "/checkout")
+                  }
                 >
                   Finalizar compra
                 </button>
@@ -102,7 +148,12 @@ export default function Cart() {
         </div>
       </div>
 
-      {isOpen && <div className="cart-overlay" onClick={() => setIsOpen(false)} />}
+      {isOpen && (
+        <div
+          className="cart-overlay"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
     </>
   );
 }

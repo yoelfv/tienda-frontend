@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { addToCart, getCart } from "../store/cart";
+import type { Product } from "../types/product";
 
-export default function AddToCart({ product }) {
-  const [added, setAdded] = useState(false);
+interface AddToCartProps {
+  product: Product;
+}
 
-  const handleAdd = () => {
+export default function AddToCart({ product }: AddToCartProps) {
+  const [added, setAdded] = useState<boolean>(false);
+
+  const handleAdd = (): void => {
     if (!product?.available) return;
 
     if (!product || !product.id) {
@@ -13,6 +18,7 @@ export default function AddToCart({ product }) {
     }
 
     const cart = getCart();
+
     const existing = cart.find((item) => item.id === product.id);
 
     if (existing && existing.quantity >= 10) {
@@ -32,7 +38,11 @@ export default function AddToCart({ product }) {
       onClick={handleAdd}
       disabled={!product?.available}
     >
-      {!product?.available ? "Agotado" : added ? "✔ Añadido" : "Añadir al carrito"}
+      {!product?.available
+        ? "Agotado"
+        : added
+        ? "✔ Añadido"
+        : "Añadir al carrito"}
     </button>
   );
 }

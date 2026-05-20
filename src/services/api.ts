@@ -1,56 +1,77 @@
+import type { Product } from "../types/product";
+import type {
+  StrapiProduct,
+  StrapiCategory,
+  StrapiDescriptionBlock,
+  StrapiDescriptionChild,
+  StrapiConfig,
+} from "../types/strapi";
+
 const STRAPI_URL = import.meta.env.PUBLIC_STRAPI_URL?.trim() || "";
 const API_URL = STRAPI_URL ? `${STRAPI_URL}/api` : "";
 
-function getApiUrl() {
+function getApiUrl(): string {
   if (!API_URL) {
     throw new Error("PUBLIC_STRAPI_URL no está definida");
   }
   return API_URL;
 }
 
-export function getStrapiMedia(url: string | null | undefined): string {
-  if (!url) return "https://placehold.co/400x400?text=Sin+Imagen";
-  if (url.startsWith("http")) return url;
-  if (!STRAPI_URL) return "https://placehold.co/400x400?text=Sin+Imagen";
+export function getStrapiMedia(
+  url: string | null | undefined,
+): string {
+  if (!url) {
+    return "https://placehold.co/400x400?text=Sin+Imagen";
+  }
+
+  if (url.startsWith("http")) {
+    return url;
+  }
+
+  if (!STRAPI_URL) {
+    return "https://placehold.co/400x400?text=Sin+Imagen";
+  }
+
   return `${STRAPI_URL}${url}`;
 }
 
 // ============================================
-// 📦 INTERFACES
+// 🧠 HELPERS (clean parsing layer)
 // ============================================
 
-export interface ProductImage {
-  url: string;
+function parseRichText(
+  blocks: StrapiDescriptionBlock[] | null | undefined,
+): string {
+  if (!Array.isArray(blocks)) return "";
+
+  return blocks
+    .map((block) =>
+      block.children
+        ?.map((child: StrapiDescriptionChild) => child.text)
+        .join("") || "",
+    )
+    .join("\n");
 }
 
-export interface Product {
-  id: number;
-  name: string;
-  price: number;
-  available: boolean;
-  description: string;
-  image: ProductImage | null;
-  category: any | null;
-}
-
-export interface CategoryImage {
-  url: string;
-}
-
-export interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  image: CategoryImage | null;
-}
-
-export interface Config {
-  id?: number;
-  whatsapp_phone?: string;
-  telefono_whatsapp?: string;
-  base_message?: string;
-  mensaje_base?: string;
-  [key: string]: any;
+function normalizeProduct(product: StrapiProduct): Product {
+  return {
+    id: product.id,
+    name: product.nombre,
+    price: product.precio,
+    available: product.disponible,
+    description: parseRichText(product.descripcion),
+    image: product.imagen?.url
+      ? { url: product.imagen.url }
+      : null,
+    category: product.categoria
+      ? {
+          id: product.categoria.id,
+          name: product.categoria.nombre,
+          slug: product.categoria.slug,
+          image: null,
+        }
+      : null,
+  };
 }
 
 // ============================================
@@ -70,32 +91,16 @@ export async function getProducts(): Promise<Product[]> {
 
   const data = await res.json();
 
-  return (data.data || []).map((product: any) => {
-    let descriptionText = "";
+  const products: StrapiProduct[] = data.data || [];
 
-    if (product.descripcion && Array.isArray(product.descripcion)) {
-      descriptionText = product.descripcion
-        .map((block: any) => block.children?.map((child: any) => child.text).join(""))
-        .join("\n");
-    }
-
-    return {
-      id: product.id,
-      name: product.nombre,
-      price: product.precio,
-      available: product.disponible,
-      description: descriptionText,
-      image: product.imagen?.url ? { url: product.imagen.url } : null,
-      category: product.categoria || null,
-    };
-  });
+  return products.map(normalizeProduct);
 }
 
 // ============================================
 // ⚙️ CONFIG
 // ============================================
 
-export async function getConfig(): Promise<Config> {
+export async function getConfig(): Promise<StrapiConfig> {
   const res = await fetch(`${getApiUrl()}/configuracion`, {
     cache: "no-store",
   });
@@ -107,6 +112,7 @@ export async function getConfig(): Promise<Config> {
   }
 
   const data = await res.json();
+
   return data.data || {};
 }
 
@@ -114,7 +120,24 @@ export async function getConfig(): Promise<Config> {
 // 🗂️ CATEGORIES
 // ============================================
 
-export async function getCategories(): Promise<Category[]> {
+function normalizeCategory(cat: StrapiCategory) {
+  const name = cat.nombre ?? "Sin nombre";
+
+  const slug =
+    cat.slug ??
+    name.toLowerCase().replace(/\s+/g, "-");
+
+  const imageUrl = cat.imagen?.url ?? null;
+
+  return {
+    id: cat.id,
+    name,
+    slug,
+    image: imageUrl ? { url: imageUrl } : null,
+  };
+}
+
+export async function getCategories() {
   const res = await fetch(`${getApiUrl()}/categorias?populate=*`, {
     cache: "no-store",
   });
@@ -126,30 +149,10 @@ export async function getCategories(): Promise<Category[]> {
   }
 
   const response = await res.json();
-  const categoriesData = response.data || [];
 
-  return categoriesData
-    .map((cat: any) => {
-      const name = cat.nombre || cat.attributes?.nombre || "Sin nombre";
+  const categories: StrapiCategory[] = response.data || [];
 
-      const slug = cat.slug || cat.attributes?.slug || name.toLowerCase().replace(/\s+/g, "-");
-
-      let imageUrl = null;
-
-      if (cat.imagen?.url) {
-        imageUrl = cat.imagen.url;
-      } else if (cat.imagen?.data?.attributes?.url) {
-        imageUrl = cat.imagen.data.attributes.url;
-      } else if (cat.attributes?.imagen?.data?.attributes?.url) {
-        imageUrl = cat.attributes.imagen.data.attributes.url;
-      }
-
-      return {
-        id: cat.id,
-        name,
-        slug,
-        image: imageUrl ? { url: imageUrl } : null,
-      };
-    })
-    .sort((a: Category, b: Category) => a.name.localeCompare(b.name, "es"));
+  return categories
+    .map(normalizeCategory)
+    .sort((a, b) => a.name.localeCompare(b.name, "es"));
 }

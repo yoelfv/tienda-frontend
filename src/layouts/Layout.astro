@@ -4,7 +4,7 @@ import "../styles/global.css";
 const API_URL: string =
   import.meta.env.PUBLIC_API_URL || "https://tienda-backend-production-9f16.up.railway.app";
 
-let nombreTienda: string = "Mi Tienda";
+let nombreTienda: string = "Cubaclick";
 let logoUrl: string | null = null;
 
 function extraerUrlImagen(imagen: any): string | null {
@@ -16,7 +16,7 @@ function extraerUrlImagen(imagen: any): string | null {
 }
 
 try {
-  const [resConfig, resCategories] = await Promise.all([
+  const [resConfig] = await Promise.all([
     fetch(`${API_URL}/api/configuracion?populate=*`),
     fetch(`${API_URL}/api/categorias?populate=*`),
   ]);
@@ -24,14 +24,12 @@ try {
   if (resConfig.ok) {
     const configData = await resConfig.json();
     const config = configData?.data || configData || {};
-    nombreTienda = config.nombre_tienda || "Mi Tienda";
+    nombreTienda = config.nombre_tienda || "Cubaclick";
     logoUrl = extraerUrlImagen(config.logo);
   }
 } catch (error) {
   console.error("Error al cargar datos del header:", error);
 }
-
-const { title = nombreTienda } = Astro.props;
 
 // Optimizar las imágenes
 const optimizeImage = (url: string, width: number = 80): string => {

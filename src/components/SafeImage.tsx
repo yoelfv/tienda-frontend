@@ -1,28 +1,37 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
+import type { ImgHTMLAttributes } from "react";
 
-// 🔧 función de optimización Cloudinary
-const optimizeImage = (url, width = 240) => {
+const optimizeImage = (url: string, width = 240): string => {
   if (!url) return "";
 
-  // evita romper si ya está optimizada
   if (url.includes("/upload/")) {
-    return url.replace("/upload/", `/upload/f_auto,q_auto:eco,w_${width}/`);
+    return url.replace(
+      "/upload/",
+      `/upload/f_auto,q_auto:eco,w_${width}/`,
+    );
   }
 
   return url;
 };
+
+interface SafeImageProps extends ImgHTMLAttributes<HTMLImageElement> {
+  src?: string;
+  alt?: string;
+  fallback?: string;
+  className?: string;
+  width?: number;
+}
 
 export default function SafeImage({
   src,
   alt = "Imagen",
   fallback = "https://res.cloudinary.com/dllyinogi/image/upload/v1777646899/placeholder_u6r8km.png",
   className = "",
-  width = 240, // 👈 configurable
+  width = 240,
   ...props
-}) {
-  const [imgSrc, setImgSrc] = useState(src || fallback);
+}: SafeImageProps) {
+  const [imgSrc, setImgSrc] = useState<string>(src || fallback);
 
-  // 🧠 optimizar solo cuando cambie src
   const optimizedSrc = useMemo(() => {
     return optimizeImage(imgSrc, width);
   }, [imgSrc, width]);

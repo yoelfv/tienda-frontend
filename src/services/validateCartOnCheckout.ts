@@ -1,4 +1,5 @@
-import { getProducts, type Product, type ProductImage } from "./api";
+import { getProducts } from "./api";
+import type { Product, ProductImage } from "../types/product";
 
 export interface CartItem {
   id: number;

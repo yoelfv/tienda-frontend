@@ -2,13 +2,18 @@ import { useEffect, useState } from "react";
 import { getCart } from "../store/cart";
 
 export default function CartCount() {
-  const [count, setCount] = useState(() => {
+  const [count, setCount] = useState<number>(() => {
     const cart = getCart();
+
     if (!Array.isArray(cart)) return 0;
-    return cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+
+    return cart.reduce(
+      (sum, item) => sum + (item.quantity || 0),
+      0,
+    );
   });
 
-  const updateCount = () => {
+  const updateCount = (): void => {
     const cart = getCart();
 
     if (!Array.isArray(cart)) {
@@ -16,7 +21,10 @@ export default function CartCount() {
       return;
     }
 
-    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+    const totalItems = cart.reduce(
+      (sum, item) => sum + (item.quantity || 0),
+      0,
+    );
 
     setCount(totalItems);
   };
@@ -34,7 +42,9 @@ export default function CartCount() {
   return (
     <a href="/checkout" className="cart-link">
       🛒
-      <span className={`cart-badge ${count > 0 ? "active" : ""}`}>{count}</span>
+      <span className={`cart-badge ${count > 0 ? "active" : ""}`}>
+        {count}
+      </span>
     </a>
   );
 }
