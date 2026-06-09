@@ -5,10 +5,7 @@ const optimizeImage = (url: string, width = 240): string => {
   if (!url) return "";
 
   if (url.includes("/upload/")) {
-    return url.replace(
-      "/upload/",
-      `/upload/f_auto,q_auto:eco,w_${width}/`,
-    );
+    return url.replace("/upload/", `/upload/f_auto,q_auto:eco,w_${width}/`);
   }
 
   return url;

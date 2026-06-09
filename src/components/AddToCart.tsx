@@ -38,11 +38,7 @@ export default function AddToCart({ product }: AddToCartProps) {
       onClick={handleAdd}
       disabled={!product?.available}
     >
-      {!product?.available
-        ? "Agotado"
-        : added
-        ? "✔ Añadido"
-        : "Añadir al carrito"}
+      {!product?.available ? "Agotado" : added ? "✔ Añadido" : "Añadir al carrito"}
     </button>
   );
 }

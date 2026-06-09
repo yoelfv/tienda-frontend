@@ -3,9 +3,7 @@ import type { ChangeEvent } from "react";
 interface InputFieldProps {
   name: string;
   value: string;
-  onChange: (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => void;
+  onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   placeholder?: string;
   error?: string;
   as?: "input" | "textarea";
@@ -31,11 +29,7 @@ export default function InputField({
         className={error ? "input-error" : ""}
       />
 
-      {error && (
-        <span className="error-message">
-          {error}
-        </span>
-      )}
+      {error && <span className="error-message">{error}</span>}
     </>
   );
 }

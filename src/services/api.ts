@@ -23,9 +23,7 @@ function getApiUrl(): string {
 // 🧠 MEDIA HELPER
 // ============================================
 
-export function getStrapiMedia(
-  url: string | null | undefined,
-): string {
+export function getStrapiMedia(url: string | null | undefined): string {
   if (!url) {
     return "https://placehold.co/400x400?text=Sin+Imagen";
   }
@@ -45,16 +43,12 @@ export function getStrapiMedia(
 // 🧠 PARSER
 // ============================================
 
-function parseRichText(
-  blocks: StrapiDescriptionBlock[] | null | undefined,
-): string {
+function parseRichText(blocks: StrapiDescriptionBlock[] | null | undefined): string {
   if (!Array.isArray(blocks)) return "";
 
   return blocks
-    .map((block) =>
-      block.children
-        ?.map((child: StrapiDescriptionChild) => child.text)
-        .join("") || "",
+    .map(
+      (block) => block.children?.map((child: StrapiDescriptionChild) => child.text).join("") || ""
     )
     .join("\n");
 }
@@ -70,17 +64,13 @@ function normalizeProduct(product: StrapiProduct): Product {
     price: product.precio,
     available: product.disponible ?? false,
     description: parseRichText(product.descripcion),
-    image: product.imagen?.url
-      ? { url: product.imagen.url }
-      : null,
+    image: product.imagen?.url ? { url: product.imagen.url } : null,
     category: product.categoria
       ? {
           id: product.categoria.id,
           name: product.categoria.nombre,
           slug: product.categoria.slug,
-          image: product.categoria.imagen?.url
-            ? { url: product.categoria.imagen.url }
-            : null,
+          image: product.categoria.imagen?.url ? { url: product.categoria.imagen.url } : null,
         }
       : null,
   };
@@ -135,17 +125,13 @@ export async function getConfig(): Promise<StrapiConfig> {
 function normalizeCategory(cat: StrapiCategory): Category {
   const name = cat.nombre ?? "Sin nombre";
 
-  const slug =
-    cat.slug ??
-    name.toLowerCase().replace(/\s+/g, "-");
+  const slug = cat.slug ?? name.toLowerCase().replace(/\s+/g, "-");
 
   return {
     id: cat.id,
     name,
     slug,
-    image: cat.imagen?.url
-      ? { url: cat.imagen.url }
-      : null,
+    image: cat.imagen?.url ? { url: cat.imagen.url } : null,
   };
 }
 
@@ -164,7 +150,5 @@ export async function getCategories(): Promise<Category[]> {
 
   const categories: StrapiCategory[] = response.data || [];
 
-  return categories
-    .map(normalizeCategory)
-    .sort((a, b) => a.name.localeCompare(b.name, "es"));
+  return categories.map(normalizeCategory).sort((a, b) => a.name.localeCompare(b.name, "es"));
 }
