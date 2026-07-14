@@ -69,7 +69,9 @@ function normalizeProduct(product: StrapiProduct): Product {
       ? {
           id: product.categoria.id,
           name: product.categoria.nombre,
-          slug: product.categoria.slug,
+          slug:
+            product.categoria.slug ??
+            product.categoria.nombre.toLowerCase().replace(/\s+/g, "-"),
           image: product.categoria.imagen?.url ? { url: product.categoria.imagen.url } : null,
         }
       : null,
