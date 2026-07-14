@@ -83,7 +83,7 @@ function normalizeProduct(product: StrapiProduct): Product {
 // ============================================
 
 export async function getProducts(): Promise<Product[]> {
-  const res = await fetch(`${getApiUrl()}/products?populate=*`, {
+  const res = await fetch(`${getApiUrl()}/products?pagination[pageSize]=500&populate=*`, {
     cache: "no-store",
   });
 
