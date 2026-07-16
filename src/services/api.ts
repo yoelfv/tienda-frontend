@@ -100,6 +100,27 @@ export async function getProducts(): Promise<Product[]> {
   return products.map(normalizeProduct);
 }
 
+export async function getProductsByCategory(slug: string): Promise<Product[]> {
+  const res = await fetch(
+    `${getApiUrl()}/products?filters[categoria][slug][$eq]=${encodeURIComponent(slug)}&sort=nombre:asc&populate=*`,
+    {
+      cache: "no-store",
+    }
+  );
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("Error API products:", res.status, errorText);
+    throw new Error(`Error ${res.status}: failed to fetch products`);
+  }
+
+  const data = await res.json();
+
+  const products: StrapiProduct[] = data.data || [];
+
+  return products.map(normalizeProduct);
+}
+
 // ============================================
 // ⚙️ CONFIG
 // ============================================

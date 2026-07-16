@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 
-import { getProducts, getCategories } from "@/services/api";
+import { getProductsByCategory, getCategories } from "@/services/api";
+import { useCategoryScroll } from "@/hooks/useCategoryScroll";
+
+import {
+  getDailyData,
+  saveDailyData,
+} from "@/utils/storage";
 
 import CategoryBar from "./CategoryBar";
 import ProductGrid from "./ProductGrid";
@@ -8,16 +14,27 @@ import ProductGrid from "./ProductGrid";
 import type { Product } from "@/types/product";
 import type { Category } from "@/types/category";
 
+import { STORAGE_KEYS } from "@/constants/storageKeys";
+
+//const LAST_ACTIVE_CATEGORY_STORAGE_KEY = "tienda:lastActiveCategory";
+
 export default function Shop() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[] | null>(null);
+
+  const [productsCache, setProductsCache] = useState<Record<string, Product[]>>({});
 
   const [categories, setCategories] = useState<Category[]>([]);
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
 
   const [headerHeight, setHeaderHeight] = useState<number>(0);
+
+  useCategoryScroll(
+    activeCategory,
+    products !== null
+  );
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -32,21 +49,63 @@ export default function Shop() {
   }, []);
 
   useEffect(() => {
-    Promise.all([getProducts(), getCategories()])
-      .then(([prods, cats]) => {
-        const sortedCats = [...cats].sort((a, b) => a.name.localeCompare(b.name, "es"));
+    getCategories()
+      .then((cats) => {
+        const sortedCats = [...cats].sort((a, b) =>
+          a.name.localeCompare(b.name, "es")
+        );
 
-        setProducts(prods);
         setCategories(sortedCats);
 
-        if (sortedCats.length > 0) {
+        const lastCategory = getDailyData<string>(
+          STORAGE_KEYS.LAST_ACTIVE_CATEGORY
+        );
+
+        const categoryExists = sortedCats.some(
+          (cat) => cat.slug === lastCategory
+        );
+
+        if (categoryExists && lastCategory) {
+          setActiveCategory(lastCategory);
+        } else if (sortedCats.length > 0) {
           setActiveCategory(sortedCats[0].slug);
         }
       })
-      .finally(() => setLoading(false));
+      .finally(() => setLoadingCategories(false));
   }, []);
 
-  if (loading || activeCategory === null) {
+  useEffect(() => {
+    if (!activeCategory) return;
+
+    const cachedProducts = productsCache[activeCategory];
+
+    if (cachedProducts) {
+      setProducts(cachedProducts);
+      return;
+    }
+
+    setProducts(null);
+
+    getProductsByCategory(activeCategory).then((prods) => {
+      setProducts(prods);
+
+      setProductsCache((prev) => ({
+        ...prev,
+        [activeCategory]: prods,
+      }));
+    });
+  }, [activeCategory, productsCache]);
+
+  useEffect(() => {
+    if (!activeCategory) return;
+
+    saveDailyData(
+      STORAGE_KEYS.LAST_ACTIVE_CATEGORY,
+      activeCategory
+    );
+  }, [activeCategory]);
+
+  if (loadingCategories || activeCategory === null) {
     return (
       <div className="loading-container">
         <div className="spinner" />
@@ -56,7 +115,23 @@ export default function Shop() {
     );
   }
 
-  const filteredProducts = products.filter((product) => product.category?.slug === activeCategory);
+const handleCategoryChange = (newCategory: string) => {
+  if (activeCategory) {
+    const positions =
+      getDailyData<Record<string, number>>(
+        STORAGE_KEYS.CATEGORY_SCROLLS
+      ) ?? {};
+
+    positions[activeCategory] = window.scrollY;
+
+    saveDailyData(
+      STORAGE_KEYS.CATEGORY_SCROLLS,
+      positions
+    );
+  }
+
+  setActiveCategory(newCategory);
+};
 
   return (
     <>
@@ -69,7 +144,7 @@ export default function Shop() {
         <CategoryBar
           categories={categories}
           activeCategory={activeCategory}
-          onSelect={setActiveCategory}
+          onSelect={handleCategoryChange}
         />
       </div>
 
@@ -79,7 +154,7 @@ export default function Shop() {
           paddingTop: `${headerHeight}px`,
         }}
       >
-        <ProductGrid products={filteredProducts} />
+        <ProductGrid products={products} />
       </div>
     </>
   );

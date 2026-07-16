@@ -947,3 +947,76 @@ html {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.35) transparent;
 }
+
+/* Skeleton Loading Styles */
+
+.skeleton-card {
+  pointer-events: none;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #e5e7eb;
+  border-radius: 8px;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.6),
+    transparent
+  );
+  animation: skeleton-loading 1.2s infinite;
+}
+
+@keyframes skeleton-loading {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-image {
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: 1rem;
+}
+
+.skeleton-title {
+  height: 22px;
+  width: 75%;
+  margin-bottom: .8rem;
+}
+
+.skeleton-price {
+  height: 20px;
+  width: 40%;
+  margin-bottom: .8rem;
+}
+
+.skeleton-line {
+  height: 14px;
+  width: 100%;
+  margin-bottom: .5rem;
+}
+
+.skeleton-line.short {
+  width: 70%;
+}
+
+.skeleton-stock {
+  height: 18px;
+  width: 45%;
+  margin: 1rem 0;
+}
+
+.skeleton-button {
+  height: 42px;
+  width: 100%;
+  border-radius: 999px;
+}

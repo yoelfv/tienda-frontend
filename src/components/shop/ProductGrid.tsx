@@ -1,4 +1,5 @@
 import { getStrapiMedia } from "@/services/api";
+import ProductGridSkeleton from "./ProductGridSkeleton";
 
 import AddToCart from "@/components/AddToCart";
 import SafeImage from "@/components/SafeImage";
@@ -6,7 +7,7 @@ import SafeImage from "@/components/SafeImage";
 import type { Product } from "@/types/product";
 
 type ProductGridProps = {
-  products: Product[];
+  products: Product[] | null;
 };
 
 type ProductCardProps = {
@@ -21,6 +22,10 @@ export default function ProductGrid({ products }: ProductGridProps) {
       currency: "USD",
     }).format(value);
 
+  if (products === null) {
+    return <ProductGridSkeleton />;
+  }
+  
   if (!products.length) {
     return <p className="no-products">No hay productos en esta categoría</p>;
   }

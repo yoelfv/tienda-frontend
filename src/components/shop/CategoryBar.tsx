@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 import { getStrapiMedia } from "@/services/api";
 
@@ -10,9 +10,16 @@ type CategoryBarProps = {
   onSelect: (slug: string) => void;
 };
 
-export default function CategoryBar({ categories, activeCategory, onSelect }: CategoryBarProps) {
+const ACTIVE_CATEGORY_SELECTOR = ".cat-chip.active";
+
+export default function CategoryBar({
+  categories,
+  activeCategory,
+  onSelect,
+}: CategoryBarProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
+  // Permite desplazar horizontalmente la barra con la rueda del ratón.
   useEffect(() => {
     const element = scrollRef.current;
 
@@ -38,6 +45,33 @@ export default function CategoryBar({ categories, activeCategory, onSelect }: Ca
       element.removeEventListener("wheel", handleWheel);
     };
   }, []);
+
+  // Mantiene visible y centrada la categoría activa.
+  useLayoutEffect(() => {
+    const container = scrollRef.current;
+
+    if (!container) return;
+
+    const activeButton =
+      container.querySelector<HTMLElement>(ACTIVE_CATEGORY_SELECTOR);
+
+    if (!activeButton) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const buttonRect = activeButton.getBoundingClientRect();
+
+    const isFullyVisible =
+      buttonRect.left >= containerRect.left &&
+      buttonRect.right <= containerRect.right;
+
+    if (!isFullyVisible) {
+      activeButton.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
+    }
+  }, [activeCategory]);
 
   return (
     <div className="categories-scroll" ref={scrollRef}>

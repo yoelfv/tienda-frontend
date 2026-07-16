@@ -1,14 +1,23 @@
 import type { CartItem, Product } from "@/types/product";
 
+import {
+  getDailyData,
+  saveDailyData,
+} from "@/utils/storage";
+
+import { STORAGE_KEYS } from "@/constants/storageKeys";
+
 export function getCart(): CartItem[] {
   if (typeof window === "undefined") {
     return [];
   }
 
   try {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    return Array.isArray(cart) ? (cart as CartItem[]) : [];
+    return (
+      getDailyData<CartItem[]>(
+        STORAGE_KEYS.CART
+      ) ?? []
+    );
   } catch (error) {
     console.error("Error reading cart:", error);
     return [];
@@ -20,7 +29,10 @@ export function saveCart(cart: CartItem[]): void {
     return;
   }
 
-  localStorage.setItem("cart", JSON.stringify(cart));
+  saveDailyData(
+    STORAGE_KEYS.CART,
+    cart
+  );
 
   notifyCartChange();
 }
