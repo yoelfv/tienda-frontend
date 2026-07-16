@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { ChangeEvent } from "react";
 
-import { getCart } from "@/store/cart";
+import { getCart, clearCart, saveCart } from "@/store/cart";
 import { getConfig } from "@/services/api";
 import { useCheckoutForm } from "@/hooks/useCheckoutForm";
 
@@ -78,9 +78,7 @@ export default function CheckoutForm() {
       if (userConfirmed) {
         const validCart = cart.filter((item) => !missingProducts.some((mp) => mp.id === item.id));
 
-        localStorage.setItem("cart", JSON.stringify(validCart));
-
-        window.dispatchEvent(new Event("cartUpdated"));
+        saveCart(validCart);
         window.location.reload();
       }
 
@@ -107,8 +105,7 @@ export default function CheckoutForm() {
 
       window.open(whatsappUrl, "_blank", "noopener,noreferrer");
 
-      localStorage.removeItem("cart");
-      window.dispatchEvent(new Event("cartUpdated"));
+      clearCart();
 
       window.location.href = "/order-success";
     } catch (error) {
