@@ -204,7 +204,7 @@ const loadNextPage = async () => {
                   onClick={loadNextPage}
                   disabled={isLoadingMore}
                 >
-                  {isLoadingMore ? "Cargando..." : "Ver más productos"}
+                  {isLoadingMore ? "Cargando más productos..." : "Ver más productos"}
                 </button>
               </div>
             )}
