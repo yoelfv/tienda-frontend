@@ -21,3 +21,9 @@ export interface CartItem {
   image: ProductImage | null;
   quantity: number;
 }
+
+export interface ProductPage {
+  products: Product[];
+  hasMore: boolean;
+  page: number;
+}

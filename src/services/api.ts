@@ -1,4 +1,4 @@
-import type { Product } from "@/types/product";
+import type { Product, ProductPage } from "@/types/product";
 import type {
   StrapiProduct,
   StrapiCategory,
@@ -107,26 +107,8 @@ function normalizeProduct(product: StrapiProduct): Product {
 // ============================================
 
 export async function getProducts(): Promise<Product[]> {
-  const res = await fetch(`${getApiUrl()}/products?pagination[pageSize]=500&sort=nombre:asc&populate=*`, {
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.error("Error API products:", res.status, errorText);
-    throw new Error(`Error ${res.status}: failed to fetch products`);
-  }
-
-  const data = await res.json();
-
-  const products: StrapiProduct[] = data.data || [];
-
-  return products.map(normalizeProduct);
-}
-
-export async function getProductsByCategory(slug: string): Promise<Product[]> {
   const res = await fetch(
-    `${getApiUrl()}/products?filters[categoria][slug][$eq]=${encodeURIComponent(slug)}&sort=nombre:asc&populate=*`,
+    `${getApiUrl()}/products?pagination[pageSize]=500&sort=nombre:asc&populate=*`,
     {
       cache: "no-store",
     }
@@ -143,6 +125,42 @@ export async function getProductsByCategory(slug: string): Promise<Product[]> {
   const products: StrapiProduct[] = data.data || [];
 
   return products.map(normalizeProduct);
+}
+
+export async function getProductsByCategory(
+  slug: string,
+  page = 1,
+  pageSize = 10
+  ): Promise<ProductPage> {
+  const url =
+    `${getApiUrl()}/products` +
+    `?filters[categoria][slug][$eq]=${slug}` +
+    `&sort=nombre:asc` +
+    `&pagination[page]=${page}` +
+    `&pagination[pageSize]=${pageSize}` +
+    `&populate=*`;
+
+  const res = await fetch(url, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("Error API products:", res.status, errorText);
+    throw new Error(`Error ${res.status}: failed to fetch products`);
+  }
+
+  const data = await res.json();
+
+  const products: StrapiProduct[] = data.data || [];
+
+  const pagination = data.meta.pagination;
+
+  return {
+    products: products.map(normalizeProduct),
+    page: pagination.page,
+    hasMore: pagination.page < pagination.pageCount,
+  };
 }
 
 // ============================================

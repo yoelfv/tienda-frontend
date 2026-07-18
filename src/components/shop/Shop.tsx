@@ -11,23 +11,32 @@ import {
 import CategoryBar from "./CategoryBar";
 import ProductGrid from "./ProductGrid";
 
-import type { Product } from "@/types/product";
+import type { ProductPage } from "@/types/product";
 import type { Category } from "@/types/category";
 
 import { STORAGE_KEYS } from "@/constants/storageKeys";
 
-//const LAST_ACTIVE_CATEGORY_STORAGE_KEY = "tienda:lastActiveCategory";
+import ProductGridSkeleton from "./ProductGridSkeleton";
 
 export default function Shop() {
-  const [products, setProducts] = useState<Product[] | null>(null);
 
-  const [productsCache, setProductsCache] = useState<Record<string, Product[]>>({});
+  const [productsCache, setProductsCache] = useState<Record<string, ProductPage>>({});
 
   const [categories, setCategories] = useState<Category[]>([]);
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
+  const products = activeCategory
+    ? productsCache[activeCategory] ?? null
+    : null;
+
+  const isLoadingProducts =
+    activeCategory !== null &&
+    !productsCache[activeCategory];
+
   const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
+
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const [headerHeight, setHeaderHeight] = useState<number>(0);
 
@@ -77,21 +86,14 @@ export default function Shop() {
   useEffect(() => {
     if (!activeCategory) return;
 
-    const cachedProducts = productsCache[activeCategory];
-
-    if (cachedProducts) {
-      setProducts(cachedProducts);
+    if (productsCache[activeCategory]) {
       return;
     }
 
-    setProducts(null);
-
-    getProductsByCategory(activeCategory).then((prods) => {
-      setProducts(prods);
-
+    getProductsByCategory(activeCategory).then((result) => {
       setProductsCache((prev) => ({
         ...prev,
-        [activeCategory]: prods,
+        [activeCategory]: result,
       }));
     });
   }, [activeCategory, productsCache]);
@@ -133,6 +135,41 @@ const handleCategoryChange = (newCategory: string) => {
   setActiveCategory(newCategory);
 };
 
+const loadNextPage = async () => {
+  if (!activeCategory || isLoadingMore) {
+    return;
+  }
+
+  const currentPage = productsCache[activeCategory];
+
+  if (!currentPage || !currentPage.hasMore) {
+    return;
+  }
+
+  setIsLoadingMore(true);
+
+  try {
+    const nextPage = await getProductsByCategory(
+      activeCategory,
+      currentPage.page + 1
+    );
+
+    setProductsCache((prev) => ({
+      ...prev,
+      [activeCategory]: {
+        products: [
+          ...prev[activeCategory].products,
+          ...nextPage.products,
+        ],
+        page: nextPage.page,
+        hasMore: nextPage.hasMore,
+      },
+    }));
+  } finally {
+    setIsLoadingMore(false);
+  }
+};
+
   return (
     <>
       <div
@@ -154,7 +191,25 @@ const handleCategoryChange = (newCategory: string) => {
           paddingTop: `${headerHeight}px`,
         }}
       >
-        <ProductGrid products={products} />
+        {isLoadingProducts ? (
+          <ProductGridSkeleton />
+        ) : (
+          <>
+            <ProductGrid products={products?.products ?? []} />
+
+            {products?.hasMore && (
+              <div className="load-more-container">
+                <button
+                  className="btn-load-more"
+                  onClick={loadNextPage}
+                  disabled={isLoadingMore}
+                >
+                  {isLoadingMore ? "Cargando..." : "Ver más productos"}
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </>
   );
