@@ -17,7 +17,7 @@ type ProductCardProps = {
 
 export default function ProductGrid({ products }: ProductGridProps) {
   const formatPrice = (value: number): string =>
-    new Intl.NumberFormat("es-ES", {
+    new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
     }).format(value);
@@ -25,7 +25,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
   if (products === null) {
     return <ProductGridSkeleton />;
   }
-  
+
   if (!products.length) {
     return <p className="no-products">No hay productos en esta categoría</p>;
   }

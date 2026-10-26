@@ -58,47 +58,25 @@ function parseRichText(blocks: StrapiDescriptionBlock[] | null | undefined): str
 // ============================================
 
 function normalizeProduct(product: StrapiProduct): Product {
+  const parsedPrice = Number(product.precio);
+
   return {
     id: product.id,
-
-    name:
-      product.nombre?.trim() ||
-      "Producto sin nombre",
-
-    price:
-      typeof product.precio === "number"
-        ? product.precio
-        : 0,
-
-    available:
-      product.disponible ?? false,
-
-    description:
-      parseRichText(product.descripcion),
-
-    image:
-      product.imagen?.url
-        ? { url: product.imagen.url }
-        : null,
-
-    category:
-      product.categoria
-        ? {
-            id: product.categoria.id,
-            name:
-              product.categoria.nombre?.trim() ||
-              "Sin categoría",
-            slug:
-              product.categoria.slug ||
-              "sin-categoria",
-            image:
-              product.categoria.imagen?.url
-                ? {
-                    url: product.categoria.imagen.url,
-                  }
-                : null,
-          }
-        : null,
+    name: product.nombre?.trim() || "Producto sin nombre",
+    price: Number.isNaN(parsedPrice) ? 0 : parsedPrice,
+    available: product.disponible ?? false,
+    description: parseRichText(product.descripcion),
+    image: product.imagen?.url ? { url: product.imagen.url } : null,
+    category: product.categoria
+      ? {
+          id: product.categoria.id,
+          name: product.categoria.nombre?.trim() || "Sin categoría",
+          slug: product.categoria.slug || "sin-categoria",
+          image: product.categoria.imagen?.url
+            ? { url: product.categoria.imagen.url }
+            : null,
+        }
+      : null,
   };
 }
 

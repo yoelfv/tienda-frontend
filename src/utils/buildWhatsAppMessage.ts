@@ -2,6 +2,12 @@ import type { CartItem } from "@/types/product";
 import type { CheckoutFormData } from "@/types/checkout";
 import type { Config } from "@/types/config";
 
+const formatPrice = (value: number): string =>
+  new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+
 export function buildWhatsAppMessage(
   formData: CheckoutFormData,
   cart: CartItem[],
@@ -24,10 +30,10 @@ export function buildWhatsAppMessage(
   message += `🛒 PRODUCTOS:\n`;
 
   cart.forEach((item) => {
-    message += `• ${item.name} x${item.quantity} = $${item.price * item.quantity}\n`;
+    message += `• ${item.name} x${item.quantity} = $${formatPrice(item.price * item.quantity)}\n`;
   });
 
-  message += `💵 Total: $${total}\n\n`;
+  message += `💵 Total: $${formatPrice(total)}\n\n`;
 
   const note = formData.note?.trim();
 

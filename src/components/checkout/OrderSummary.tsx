@@ -5,6 +5,12 @@ type OrderSummaryProps = {
   total: number;
 };
 
+const formatPrice = (value: number): string =>
+  new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+
 export default function OrderSummary({ cart, total }: OrderSummaryProps) {
   return (
     <div className="checkout-section">
@@ -16,11 +22,11 @@ export default function OrderSummary({ cart, total }: OrderSummaryProps) {
             {item.name} x{item.quantity}
           </span>
 
-          <span>${item.price * item.quantity}</span>
+          <span>${formatPrice(item.price * item.quantity)}</span>
         </div>
       ))}
 
-      <h3>Total: ${total}</h3>
+      <h3>Total: ${formatPrice(total)}</h3>
     </div>
   );
 }

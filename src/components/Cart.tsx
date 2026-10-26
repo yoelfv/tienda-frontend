@@ -27,7 +27,11 @@ export default function Cart() {
     };
   }, []);
 
-  const formatPrice = (value: number): string => new Intl.NumberFormat("es-ES").format(value);
+  const formatPrice = (value: number): string =>
+    new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
