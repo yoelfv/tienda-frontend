@@ -85,24 +85,41 @@ function normalizeProduct(product: StrapiProduct): Product {
 // ============================================
 
 export async function getProducts(): Promise<Product[]> {
-  const res = await fetch(
-    `${getApiUrl()}/products?pagination[pageSize]=500&sort=nombre:asc&populate=*`,
-    {
-      cache: "no-store",
-    }
-  );
+  const allProducts: StrapiProduct[] = [];
+  let page = 1;
+  let pageCount = 1;
+  const pageSize = 100;
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.error("Error API products:", res.status, errorText);
-    throw new Error(`Error ${res.status}: failed to fetch products`);
+  while (page <= pageCount) {
+    const url = `${getApiUrl()}/products?pagination[page]=${page}&pagination[pageSize]=${pageSize}&sort=nombre:asc&populate=*`;
+
+    const res = await fetch(url, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Error API products:", res.status, errorText);
+      throw new Error(`Error ${res.status}: failed to fetch products`);
+    }
+
+    const data = await res.json();
+    const products: StrapiProduct[] = data.data || [];
+
+    allProducts.push(...products);
+
+    // Leer meta.pagination.pageCount
+    const meta = data.meta;
+    if (meta?.pagination?.pageCount) {
+      pageCount = meta.pagination.pageCount;
+    } else {
+      pageCount = 1;
+    }
+
+    page += 1;
   }
 
-  const data = await res.json();
-
-  const products: StrapiProduct[] = data.data || [];
-
-  return products.map(normalizeProduct);
+  return allProducts.map(normalizeProduct);
 }
 
 export async function getProductsByCategory(
