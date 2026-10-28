@@ -52,7 +52,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
 
       {lightboxImage && (
         <ImageLightbox
-          key={`${lightboxImage.src}-${lightboxImage.alt}`}
+          key={lightboxImage.src}
           src={lightboxImage.src}
           alt={lightboxImage.alt}
           isOpen={!!lightboxImage}
@@ -70,12 +70,21 @@ interface ProductCardWithLightboxProps extends ProductCardProps {
 function ProductCard({ product, formatPrice, onImageClick }: ProductCardWithLightboxProps) {
   const imageSrc = getStrapiMedia(product.image?.url);
 
+  // URL optimizada para el lightbox:
+  // - w_auto:100:1600 → ancho del dispositivo (2x para Retina), con límite 1600px
+  // - c_limit         → no agranda imágenes más allá de su tamaño original
+  // - f_auto          → formato óptimo (WebP/AVIF si el navegador lo soporta)
+  // - q_auto:good     → calidad alta pero optimizada
+  const optimizedImageSrc = imageSrc.includes("/upload/")
+    ? imageSrc.replace("/upload/", "/upload/w_auto:100:1600,c_limit,f_auto,q_auto:good/")
+    : imageSrc;
+
   return (
     <div className="card">
       <button
         type="button"
         className="product-image-button"
-        onClick={() => onImageClick(imageSrc, product.name)}
+        onClick={() => onImageClick(optimizedImageSrc, product.name)}
         aria-label={`Ver imagen de ${product.name} en grande`}
       >
         <SafeImage src={imageSrc} alt={product.name} className="product-img" width={240} />
