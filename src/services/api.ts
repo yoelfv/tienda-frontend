@@ -65,6 +65,7 @@ function normalizeProduct(product: StrapiProduct): Product {
     name: product.nombre?.trim() || "Producto sin nombre",
     price: Number.isNaN(parsedPrice) ? 0 : parsedPrice,
     available: product.disponible ?? false,
+    saleUnit: product.saleUnit ?? "unit",
     description: parseRichText(product.descripcion),
     image: product.imagen?.url ? { url: product.imagen.url } : null,
     category: product.categoria

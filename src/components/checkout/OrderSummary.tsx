@@ -19,7 +19,8 @@ export default function OrderSummary({ cart, total }: OrderSummaryProps) {
       {cart.map((item) => (
         <div key={item.id} className="resumen-item">
           <span>
-            {item.name} x{item.quantity}
+            {item.name} x {item.quantity}
+            {item.saleUnit === "weight" ? " lb" : ""}
           </span>
 
           <span>${formatPrice(item.price * item.quantity)}</span>

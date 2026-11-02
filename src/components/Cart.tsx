@@ -35,16 +35,18 @@ export default function Cart() {
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const distinctCount = cart.length;
 
   return (
     <>
       <button
-        className={`cart-fab ${totalItems > 0 ? "has-items" : ""}`}
+        className={`cart-fab ${distinctCount > 0 ? "has-items" : ""}`}
         onClick={() => setIsOpen(!isOpen)}
       >
         🛒
-        {totalItems > 0 && <span className="cart-fab-badge">{totalItems}</span>}
+        {distinctCount > 0 && (
+          <span className="cart-fab-badge">{distinctCount > 99 ? "99+" : distinctCount}</span>
+        )}
       </button>
 
       <div className={`cart-panel ${isOpen ? "open" : ""}`}>
@@ -64,7 +66,10 @@ export default function Cart() {
                 <div key={item.id} className="cart-item">
                   <div className="cart-item-top">
                     <div className="cart-item-info">
-                      <p className="cart-item-name">{item.name}</p>
+                      <p className="cart-item-name">
+                        {item.name}
+                        {item.saleUnit === "weight" ? " (libras)" : ""}
+                      </p>
 
                       <p className="cart-item-price">${formatPrice(item.price)}</p>
                     </div>
@@ -72,17 +77,22 @@ export default function Cart() {
 
                   <div className="qty-controls">
                     <button
-                      onClick={() => updateQuantity(item.id, -1)}
-                      disabled={item.quantity <= 1}
+                      onClick={() =>
+                        updateQuantity(item.id, item.saleUnit === "weight" ? -0.5 : -1)
+                      }
+                      disabled={item.quantity <= (item.saleUnit === "weight" ? 0.5 : 1)}
                     >
                       −
                     </button>
 
-                    <span>{item.quantity}</span>
+                    <span>
+                      {item.quantity}
+                      {item.saleUnit === "weight" ? " lb" : ""}
+                    </span>
 
                     <button
-                      onClick={() => updateQuantity(item.id, 1)}
-                      disabled={item.quantity >= 10}
+                      onClick={() => updateQuantity(item.id, item.saleUnit === "weight" ? 0.5 : 1)}
+                      disabled={item.quantity >= (item.saleUnit === "weight" ? 50 : 10)}
                     >
                       +
                     </button>

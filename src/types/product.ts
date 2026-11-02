@@ -9,6 +9,7 @@ export interface Product {
   name: string;
   price: number;
   available: boolean;
+  saleUnit: "unit" | "weight";
   description: string;
   image: ProductImage | null;
   category: Category | null;
@@ -20,6 +21,7 @@ export interface CartItem {
   price: number;
   image: ProductImage | null;
   quantity: number;
+  saleUnit: "unit" | "weight";
 }
 
 export interface ProductPage {

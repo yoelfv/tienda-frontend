@@ -93,7 +93,10 @@ function ProductCard({ product, formatPrice, onImageClick }: ProductCardWithLigh
       <div className="card-body">
         <h3>{product.name}</h3>
 
-        <p className="price">{formatPrice(product.price)}</p>
+        <p className="price">
+          {formatPrice(product.price)}
+          {product.saleUnit === "weight" && <span className="price-unit"> / lb</span>}
+        </p>
 
         {product.description && <p className="description">{product.description}</p>}
 

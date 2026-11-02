@@ -21,6 +21,7 @@ export interface StrapiProduct {
   nombre: string;
   precio: number;
   disponible: boolean;
+  saleUnit: "unit" | "weight";
   descripcion?: StrapiDescriptionBlock[] | null;
 
   imagen: {

@@ -619,6 +619,12 @@ textarea {
   color: #777;
 }
 
+.price-unit {
+  font-size: 0.75em;
+  color: #888;
+  font-weight: normal;
+}
+
 /* ========== CARRITO CONTROLES ========== */
 .qty-controls {
   display: flex;

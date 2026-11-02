@@ -62,6 +62,7 @@ export function addToCart(product: Product): void {
         price: product.price,
         image: product.image,
         quantity: 1,
+        saleUnit: product.saleUnit,
       },
     ];
   }
@@ -83,12 +84,22 @@ export function updateQuantity(productId: number, amount: number): void {
   const updatedCart = cart
     .map((item) => {
       if (item.id === productId) {
+        const isWeight = item.saleUnit === "weight";
         const newQuantity = item.quantity + amount;
 
-        if (newQuantity <= 0) return null;
-        if (newQuantity > 10) return item;
+        // Límites según el tipo de producto
+        const minQuantity = isWeight ? 0.5 : 1;
+        const maxQuantity = isWeight ? 50 : 10;
 
-        return { ...item, quantity: newQuantity };
+        if (newQuantity < minQuantity) return null;
+        if (newQuantity > maxQuantity) return item;
+
+        // Redondear a 2 decimales para pesos (evitar 1.5000000001)
+        const rounded = isWeight
+          ? Math.round(newQuantity * 100) / 100
+          : newQuantity;
+
+        return { ...item, quantity: rounded };
       }
 
       return item;

@@ -30,7 +30,8 @@ export function buildWhatsAppMessage(
   message += `🛒 PRODUCTOS:\n`;
 
   cart.forEach((item) => {
-    message += `• ${item.name} x${item.quantity} = $${formatPrice(item.price * item.quantity)}\n`;
+    const unitLabel = item.saleUnit === "weight" ? " lb" : "";
+    message += `• ${item.name} x ${item.quantity}${unitLabel} = $${formatPrice(item.price * item.quantity)}\n`;
   });
 
   message += `💵 Total: $${formatPrice(total)}\n\n`;

@@ -1,27 +1,21 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getCart } from "@/store/cart";
 
 export default function CartCount() {
-  const [count, setCount] = useState<number>(() => {
+  // Contar productos distintos (no sumar cantidades)
+  const getCount = (): number => {
     const cart = getCart();
 
     if (!Array.isArray(cart)) return 0;
 
-    return cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
-  });
-
-  const updateCount = (): void => {
-    const cart = getCart();
-
-    if (!Array.isArray(cart)) {
-      setCount(0);
-      return;
-    }
-
-    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
-
-    setCount(totalItems);
+    return cart.length;
   };
+
+  const [count, setCount] = useState<number>(getCount);
+
+  const updateCount = useCallback((): void => {
+    setCount(getCount());
+  }, []);
 
   useEffect(() => {
     window.addEventListener("cartUpdated", updateCount);
@@ -31,12 +25,15 @@ export default function CartCount() {
       window.removeEventListener("cartUpdated", updateCount);
       window.removeEventListener("storage", updateCount);
     };
-  }, []);
+  }, [updateCount]);
+
+  // Si hay más de 99 productos distintos, mostrar "99+"
+  const displayCount = count > 99 ? "99+" : count;
 
   return (
     <a href="/checkout" className="cart-link">
       🛒
-      <span className={`cart-badge ${count > 0 ? "active" : ""}`}>{count}</span>
+      <span className={`cart-badge ${count > 0 ? "active" : ""}`}>{displayCount}</span>
     </a>
   );
 }
