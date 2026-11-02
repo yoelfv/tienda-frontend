@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { addToCart, getCart } from "@/store/cart";
+import { getCartLimit } from "@/constants/cartLimits";
 import type { Product } from "@/types/product";
 
 interface AddToCartProps {
@@ -18,11 +19,11 @@ export default function AddToCart({ product }: AddToCartProps) {
     }
 
     const cart = getCart();
-
     const existing = cart.find((item) => item.id === product.id);
+    const limit = getCartLimit(product.saleUnit);
 
-    if (existing && existing.quantity >= 10) {
-      alert("Has alcanzado el máximo de 10 unidades para este producto");
+    if (existing && existing.quantity >= limit.max) {
+      alert(`Has alcanzado el máximo de ${limit.max} ${limit.label} para este producto`);
       return;
     }
 

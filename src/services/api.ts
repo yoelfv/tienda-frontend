@@ -73,9 +73,7 @@ function normalizeProduct(product: StrapiProduct): Product {
           id: product.categoria.id,
           name: product.categoria.nombre?.trim() || "Sin categoría",
           slug: product.categoria.slug || "sin-categoria",
-          image: product.categoria.imagen?.url
-            ? { url: product.categoria.imagen.url }
-            : null,
+          image: product.categoria.imagen?.url ? { url: product.categoria.imagen.url } : null,
         }
       : null,
   };
@@ -127,7 +125,7 @@ export async function getProductsByCategory(
   slug: string,
   page = 1,
   pageSize = 10
-  ): Promise<ProductPage> {
+): Promise<ProductPage> {
   const url =
     `${getApiUrl()}/products` +
     `?filters[categoria][slug][$eq]=${slug}` +

@@ -3,10 +3,7 @@ import { useEffect, useState } from "react";
 import { getProductsByCategory, getCategories } from "@/services/api";
 import { useCategoryScroll } from "@/hooks/useCategoryScroll";
 
-import {
-  getDailyData,
-  saveDailyData,
-} from "@/utils/storage";
+import { getDailyData, saveDailyData } from "@/utils/storage";
 
 import CategoryBar from "./CategoryBar";
 import ProductGrid from "./ProductGrid";
@@ -19,20 +16,15 @@ import { STORAGE_KEYS } from "@/constants/storageKeys";
 import ProductGridSkeleton from "./ProductGridSkeleton";
 
 export default function Shop() {
-
   const [productsCache, setProductsCache] = useState<Record<string, ProductPage>>({});
 
   const [categories, setCategories] = useState<Category[]>([]);
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const products = activeCategory
-    ? productsCache[activeCategory] ?? null
-    : null;
+  const products = activeCategory ? (productsCache[activeCategory] ?? null) : null;
 
-  const isLoadingProducts =
-    activeCategory !== null &&
-    !productsCache[activeCategory];
+  const isLoadingProducts = activeCategory !== null && !productsCache[activeCategory];
 
   const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
 
@@ -40,10 +32,7 @@ export default function Shop() {
 
   const [headerHeight, setHeaderHeight] = useState<number>(0);
 
-  useCategoryScroll(
-    activeCategory,
-    products !== null
-  );
+  useCategoryScroll(activeCategory, products !== null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -60,19 +49,13 @@ export default function Shop() {
   useEffect(() => {
     getCategories()
       .then((cats) => {
-        const sortedCats = [...cats].sort((a, b) =>
-          a.name.localeCompare(b.name, "es")
-        );
+        const sortedCats = [...cats].sort((a, b) => a.name.localeCompare(b.name, "es"));
 
         setCategories(sortedCats);
 
-        const lastCategory = getDailyData<string>(
-          STORAGE_KEYS.LAST_ACTIVE_CATEGORY
-        );
+        const lastCategory = getDailyData<string>(STORAGE_KEYS.LAST_ACTIVE_CATEGORY);
 
-        const categoryExists = sortedCats.some(
-          (cat) => cat.slug === lastCategory
-        );
+        const categoryExists = sortedCats.some((cat) => cat.slug === lastCategory);
 
         if (categoryExists && lastCategory) {
           setActiveCategory(lastCategory);
@@ -101,10 +84,7 @@ export default function Shop() {
   useEffect(() => {
     if (!activeCategory) return;
 
-    saveDailyData(
-      STORAGE_KEYS.LAST_ACTIVE_CATEGORY,
-      activeCategory
-    );
+    saveDailyData(STORAGE_KEYS.LAST_ACTIVE_CATEGORY, activeCategory);
   }, [activeCategory]);
 
   if (loadingCategories || activeCategory === null) {
@@ -117,58 +97,46 @@ export default function Shop() {
     );
   }
 
-const handleCategoryChange = (newCategory: string) => {
-  if (activeCategory) {
-    const positions =
-      getDailyData<Record<string, number>>(
-        STORAGE_KEYS.CATEGORY_SCROLLS
-      ) ?? {};
+  const handleCategoryChange = (newCategory: string) => {
+    if (activeCategory) {
+      const positions = getDailyData<Record<string, number>>(STORAGE_KEYS.CATEGORY_SCROLLS) ?? {};
 
-    positions[activeCategory] = window.scrollY;
+      positions[activeCategory] = window.scrollY;
 
-    saveDailyData(
-      STORAGE_KEYS.CATEGORY_SCROLLS,
-      positions
-    );
-  }
+      saveDailyData(STORAGE_KEYS.CATEGORY_SCROLLS, positions);
+    }
 
-  setActiveCategory(newCategory);
-};
+    setActiveCategory(newCategory);
+  };
 
-const loadNextPage = async () => {
-  if (!activeCategory || isLoadingMore) {
-    return;
-  }
+  const loadNextPage = async () => {
+    if (!activeCategory || isLoadingMore) {
+      return;
+    }
 
-  const currentPage = productsCache[activeCategory];
+    const currentPage = productsCache[activeCategory];
 
-  if (!currentPage || !currentPage.hasMore) {
-    return;
-  }
+    if (!currentPage || !currentPage.hasMore) {
+      return;
+    }
 
-  setIsLoadingMore(true);
+    setIsLoadingMore(true);
 
-  try {
-    const nextPage = await getProductsByCategory(
-      activeCategory,
-      currentPage.page + 1
-    );
+    try {
+      const nextPage = await getProductsByCategory(activeCategory, currentPage.page + 1);
 
-    setProductsCache((prev) => ({
-      ...prev,
-      [activeCategory]: {
-        products: [
-          ...prev[activeCategory].products,
-          ...nextPage.products,
-        ],
-        page: nextPage.page,
-        hasMore: nextPage.hasMore,
-      },
-    }));
-  } finally {
-    setIsLoadingMore(false);
-  }
-};
+      setProductsCache((prev) => ({
+        ...prev,
+        [activeCategory]: {
+          products: [...prev[activeCategory].products, ...nextPage.products],
+          page: nextPage.page,
+          hasMore: nextPage.hasMore,
+        },
+      }));
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   return (
     <>
@@ -199,11 +167,7 @@ const loadNextPage = async () => {
 
             {products?.hasMore && (
               <div className="load-more-container">
-                <button
-                  className="btn-load-more"
-                  onClick={loadNextPage}
-                  disabled={isLoadingMore}
-                >
+                <button className="btn-load-more" onClick={loadNextPage} disabled={isLoadingMore}>
                   {isLoadingMore ? "Cargando más productos..." : "Ver más productos"}
                 </button>
               </div>

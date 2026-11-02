@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getCart, removeFromCart, updateQuantity } from "@/store/cart";
 import type { CartItem } from "@/types/product";
+import { getCartLimit } from "@/constants/cartLimits";
 
 export default function Cart() {
   const [cart, setCart] = useState<CartItem[]>(() => {
@@ -76,26 +77,33 @@ export default function Cart() {
                   </div>
 
                   <div className="qty-controls">
-                    <button
-                      onClick={() =>
-                        updateQuantity(item.id, item.saleUnit === "weight" ? -0.5 : -1)
-                      }
-                      disabled={item.quantity <= (item.saleUnit === "weight" ? 0.5 : 1)}
-                    >
-                      −
-                    </button>
+                    {(() => {
+                      const limit = getCartLimit(item.saleUnit);
+                      const step = item.saleUnit === "weight" ? 0.5 : 1;
 
-                    <span>
-                      {item.quantity}
-                      {item.saleUnit === "weight" ? " lb" : ""}
-                    </span>
+                      return (
+                        <>
+                          <button
+                            onClick={() => updateQuantity(item.id, -step)}
+                            disabled={item.quantity <= limit.min}
+                          >
+                            −
+                          </button>
 
-                    <button
-                      onClick={() => updateQuantity(item.id, item.saleUnit === "weight" ? 0.5 : 1)}
-                      disabled={item.quantity >= (item.saleUnit === "weight" ? 50 : 10)}
-                    >
-                      +
-                    </button>
+                          <span>
+                            {item.quantity}
+                            {item.saleUnit === "weight" ? " lb" : ""}
+                          </span>
+
+                          <button
+                            onClick={() => updateQuantity(item.id, step)}
+                            disabled={item.quantity >= limit.max}
+                          >
+                            +
+                          </button>
+                        </>
+                      );
+                    })()}
                   </div>
 
                   <p className="cart-item-subtotal">

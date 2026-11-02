@@ -124,9 +124,13 @@ export default function CheckoutForm() {
 
       <OrderSummary cart={cart} total={total} />
 
-      <SenderForm formData={formData} handleChange={handleChange} errors={errors} />
+      <SenderForm formData={formData} handleChange={handleChange} errorPhone={errors.senderPhone} />
 
-      <DeliveryForm formData={formData} handleChange={handleChange} errors={errors} />
+      <DeliveryForm
+        formData={formData}
+        handleChange={handleChange}
+        errorPhone={errors.recipientPhone}
+      />
 
       <button className="btn-primary" onClick={submitOrder} disabled={isLoading}>
         {isLoading ? "Enviando..." : "Enviar pedido por WhatsApp"}

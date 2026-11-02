@@ -6,13 +6,10 @@ import type { CheckoutFormData } from "@/types/checkout";
 type SenderFormProps = {
   formData: CheckoutFormData;
   handleChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  errors: {
-    senderPhone: string;
-    recipientPhone: string;
-  };
+  errorPhone?: string;
 };
 
-export default function SenderForm({ formData, handleChange, errors }: SenderFormProps) {
+export default function SenderForm({ formData, handleChange, errorPhone }: SenderFormProps) {
   return (
     <div className="checkout-section">
       <h3>Tus datos</h3>
@@ -29,7 +26,7 @@ export default function SenderForm({ formData, handleChange, errors }: SenderFor
         value={formData.senderPhone}
         onChange={handleChange}
         placeholder="Teléfono de quien envía *"
-        error={errors.senderPhone}
+        error={errorPhone}
       />
     </div>
   );

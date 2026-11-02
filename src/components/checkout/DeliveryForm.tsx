@@ -6,13 +6,10 @@ import type { CheckoutFormData } from "@/types/checkout";
 type DeliveryFormProps = {
   formData: CheckoutFormData;
   handleChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  errors: {
-    senderPhone: string;
-    recipientPhone: string;
-  };
+  errorPhone?: string;
 };
 
-export default function DeliveryForm({ formData, handleChange, errors }: DeliveryFormProps) {
+export default function DeliveryForm({ formData, handleChange, errorPhone }: DeliveryFormProps) {
   return (
     <div className="checkout-section">
       <h3>Datos de entrega</h3>
@@ -29,7 +26,7 @@ export default function DeliveryForm({ formData, handleChange, errors }: Deliver
         value={formData.recipientPhone}
         onChange={handleChange}
         placeholder="Teléfono de quien recibe *"
-        error={errors.recipientPhone}
+        error={errorPhone}
       />
 
       <InputField

@@ -16,10 +16,7 @@ function extraerUrlImagen(imagen: any): string | null {
 }
 
 try {
-  const [resConfig] = await Promise.all([
-    fetch(`${API_URL}/api/configuracion?populate=*`),
-    fetch(`${API_URL}/api/categorias?populate=*`),
-  ]);
+  const resConfig = await fetch(`${API_URL}/api/configuracion?populate=*`);
 
   if (resConfig.ok) {
     const configData = await resConfig.json();

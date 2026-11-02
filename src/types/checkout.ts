@@ -6,8 +6,3 @@ export interface CheckoutFormData {
   address: string;
   note: string;
 }
-
-export interface StoreConfig {
-  base_message?: string;
-  mensaje_base?: string;
-}

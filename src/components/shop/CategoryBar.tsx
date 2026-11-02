@@ -12,11 +12,7 @@ type CategoryBarProps = {
 
 const ACTIVE_CATEGORY_SELECTOR = ".cat-chip.active";
 
-export default function CategoryBar({
-  categories,
-  activeCategory,
-  onSelect,
-}: CategoryBarProps) {
+export default function CategoryBar({ categories, activeCategory, onSelect }: CategoryBarProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   // Permite desplazar horizontalmente la barra con la rueda del ratón.
@@ -52,8 +48,7 @@ export default function CategoryBar({
 
     if (!container) return;
 
-    const activeButton =
-      container.querySelector<HTMLElement>(ACTIVE_CATEGORY_SELECTOR);
+    const activeButton = container.querySelector<HTMLElement>(ACTIVE_CATEGORY_SELECTOR);
 
     if (!activeButton) return;
 
@@ -61,8 +56,7 @@ export default function CategoryBar({
     const buttonRect = activeButton.getBoundingClientRect();
 
     const isFullyVisible =
-      buttonRect.left >= containerRect.left &&
-      buttonRect.right <= containerRect.right;
+      buttonRect.left >= containerRect.left && buttonRect.right <= containerRect.right;
 
     if (!isFullyVisible) {
       activeButton.scrollIntoView({

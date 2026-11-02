@@ -1,11 +1,7 @@
 import type { CartItem, Product } from "@/types/product";
-
-import {
-  getDailyData,
-  saveDailyData,
-} from "@/utils/storage";
-
+import { getDailyData, saveDailyData } from "@/utils/storage";
 import { STORAGE_KEYS } from "@/constants/storageKeys";
+import { getCartLimit } from "@/constants/cartLimits";
 
 export function getCart(): CartItem[] {
   if (typeof window === "undefined") {
@@ -13,11 +9,7 @@ export function getCart(): CartItem[] {
   }
 
   try {
-    return (
-      getDailyData<CartItem[]>(
-        STORAGE_KEYS.CART
-      ) ?? []
-    );
+    return getDailyData<CartItem[]>(STORAGE_KEYS.CART) ?? [];
   } catch (error) {
     console.error("Error reading cart:", error);
     return [];
@@ -29,10 +21,7 @@ export function saveCart(cart: CartItem[]): void {
     return;
   }
 
-  saveDailyData(
-    STORAGE_KEYS.CART,
-    cart
-  );
+  saveDailyData(STORAGE_KEYS.CART, cart);
 
   notifyCartChange();
 }
@@ -84,20 +73,15 @@ export function updateQuantity(productId: number, amount: number): void {
   const updatedCart = cart
     .map((item) => {
       if (item.id === productId) {
-        const isWeight = item.saleUnit === "weight";
+        const limit = getCartLimit(item.saleUnit);
         const newQuantity = item.quantity + amount;
 
-        // Límites según el tipo de producto
-        const minQuantity = isWeight ? 0.5 : 1;
-        const maxQuantity = isWeight ? 50 : 10;
-
-        if (newQuantity < minQuantity) return null;
-        if (newQuantity > maxQuantity) return item;
+        if (newQuantity < limit.min) return null;
+        if (newQuantity > limit.max) return item;
 
         // Redondear a 2 decimales para pesos (evitar 1.5000000001)
-        const rounded = isWeight
-          ? Math.round(newQuantity * 100) / 100
-          : newQuantity;
+        const rounded =
+          item.saleUnit === "weight" ? Math.round(newQuantity * 100) / 100 : newQuantity;
 
         return { ...item, quantity: rounded };
       }

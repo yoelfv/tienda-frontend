@@ -7,26 +7,16 @@ function getTodayKey(): string {
   return new Date().toISOString().split("T")[0];
 }
 
-
-export function saveDailyData<T>(
-  key: string,
-  value: T
-): void {
+export function saveDailyData<T>(key: string, value: T): void {
   const data: StoredData<T> = {
     value,
     date: getTodayKey(),
   };
 
-  localStorage.setItem(
-    key,
-    JSON.stringify(data)
-  );
+  localStorage.setItem(key, JSON.stringify(data));
 }
 
-
-export function getDailyData<T>(
-  key: string
-): T | null {
+export function getDailyData<T>(key: string): T | null {
   const stored = localStorage.getItem(key);
 
   if (!stored) {
@@ -42,16 +32,12 @@ export function getDailyData<T>(
     }
 
     return data.value;
-
   } catch {
     localStorage.removeItem(key);
     return null;
   }
 }
 
-
-export function removeDailyData(
-  key: string
-): void {
+export function removeDailyData(key: string): void {
   localStorage.removeItem(key);
 }

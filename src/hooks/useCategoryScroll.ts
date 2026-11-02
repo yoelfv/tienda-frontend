@@ -6,10 +6,7 @@ import { STORAGE_KEYS } from "@/constants/storageKeys";
 
 type ScrollPositions = Record<string, number>;
 
-export function useCategoryScroll(
-  activeCategory: string | null,
-  isReady: boolean
-) {
+export function useCategoryScroll(activeCategory: string | null, isReady: boolean) {
   const restoredCategory = useRef<string | null>(null);
 
   useEffect(() => {
@@ -19,10 +16,7 @@ export function useCategoryScroll(
       return;
     }
 
-    const positions =
-        getDailyData<ScrollPositions>(
-            STORAGE_KEYS.CATEGORY_SCROLLS
-        ) ?? {};
+    const positions = getDailyData<ScrollPositions>(STORAGE_KEYS.CATEGORY_SCROLLS) ?? {};
 
     const savedPosition = positions[activeCategory] ?? 0;
 
