@@ -5,6 +5,7 @@ import ProductGridSkeleton from "./ProductGridSkeleton";
 import AddToCart from "@/components/AddToCart";
 import SafeImage from "@/components/SafeImage";
 import ImageLightbox from "@/components/ImageLightbox";
+import { formatPrice } from "@/utils/format";
 
 import type { Product } from "@/types/product";
 
@@ -14,7 +15,6 @@ type ProductGridProps = {
 
 type ProductCardProps = {
   product: Product;
-  formatPrice: (value: number) => string;
 };
 
 export default function ProductGrid({ products }: ProductGridProps) {
@@ -22,12 +22,6 @@ export default function ProductGrid({ products }: ProductGridProps) {
     src: string;
     alt: string;
   } | null>(null);
-
-  const formatPrice = (value: number): string =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(value);
 
   if (products === null) {
     return <ProductGridSkeleton />;
@@ -44,7 +38,6 @@ export default function ProductGrid({ products }: ProductGridProps) {
           <ProductCard
             key={product.id}
             product={product}
-            formatPrice={formatPrice}
             onImageClick={(src, alt) => setLightboxImage({ src, alt })}
           />
         ))}
@@ -67,7 +60,7 @@ interface ProductCardWithLightboxProps extends ProductCardProps {
   onImageClick: (src: string, alt: string) => void;
 }
 
-function ProductCard({ product, formatPrice, onImageClick }: ProductCardWithLightboxProps) {
+function ProductCard({ product, onImageClick }: ProductCardWithLightboxProps) {
   const imageSrc = getStrapiMedia(product.image?.url);
 
   // URL optimizada para el lightbox:

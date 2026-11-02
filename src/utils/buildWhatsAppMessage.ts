@@ -1,12 +1,8 @@
+import { formatNumber } from "./format";
+
 import type { CartItem } from "@/types/product";
 import type { CheckoutFormData } from "@/types/checkout";
 import type { Config } from "@/types/config";
-
-const formatPrice = (value: number): string =>
-  new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
 
 export function buildWhatsAppMessage(
   formData: CheckoutFormData,
@@ -31,10 +27,10 @@ export function buildWhatsAppMessage(
 
   cart.forEach((item) => {
     const unitLabel = item.saleUnit === "weight" ? " lb" : "";
-    message += `• ${item.name} x ${item.quantity}${unitLabel} = $${formatPrice(item.price * item.quantity)}\n`;
+    message += `• ${item.name} x ${item.quantity}${unitLabel} = $${formatNumber(item.price * item.quantity)}\n`;
   });
 
-  message += `💵 Total: $${formatPrice(total)}\n\n`;
+  message += `💵 Total: $${formatNumber(total)}\n\n`;
 
   const note = formData.note?.trim();
 

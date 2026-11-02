@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getCart, removeFromCart, updateQuantity } from "@/store/cart";
 import type { CartItem } from "@/types/product";
 import { getCartLimit } from "@/constants/cartLimits";
+import { formatNumber } from "@/utils/format";
 
 export default function Cart() {
   const [cart, setCart] = useState<CartItem[]>(() => {
@@ -27,12 +28,6 @@ export default function Cart() {
       window.removeEventListener("storage", updateCart);
     };
   }, []);
-
-  const formatPrice = (value: number): string =>
-    new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -72,7 +67,7 @@ export default function Cart() {
                         {item.saleUnit === "weight" ? " (libras)" : ""}
                       </p>
 
-                      <p className="cart-item-price">${formatPrice(item.price)}</p>
+                      <p className="cart-item-price">${formatNumber(item.price)}</p>
                     </div>
                   </div>
 
@@ -107,7 +102,7 @@ export default function Cart() {
                   </div>
 
                   <p className="cart-item-subtotal">
-                    Subtotal: ${formatPrice(item.price * item.quantity)}
+                    Subtotal: ${formatNumber(item.price * item.quantity)}
                   </p>
 
                   <button className="remove-btn" onClick={() => removeFromCart(item.id)}>
@@ -117,7 +112,7 @@ export default function Cart() {
               ))}
 
               <div className="cart-footer">
-                <h3>Total: ${formatPrice(total)}</h3>
+                <h3>Total: ${formatNumber(total)}</h3>
 
                 <button
                   className="btn-primary"
