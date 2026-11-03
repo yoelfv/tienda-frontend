@@ -1,47 +1,48 @@
 ---
-import "../styles/global.css";
+import "@/styles/global.css";
+import { getApiUrl, parseRichText } from "@/utils/strapi-core";
+import { getStrapiMediaOrNull, optimizeCloudinary } from "@/utils/strapi-media";
 
-const API_URL: string =
-  import.meta.env.PUBLIC_API_URL || "https://tienda-backend-production-9f16.up.railway.app";
+// ============================================
+// 🔧 CONFIG DE LA TIENDA (build time)
+// ============================================
 
-let nombreTienda: string = "Cubaclick";
-let logoUrl: string | null = null;
-
-function extraerUrlImagen(imagen: any): string | null {
-  if (!imagen) return null;
-  if (typeof imagen === "string") return imagen;
-  if (imagen.url) return imagen.url;
-  if (imagen.data?.attributes?.url) return imagen.data.attributes.url;
-  return null;
+interface ConfigTienda {
+  nombre_tienda?: string;
+  logo?: unknown;
+  descripcion_tienda?: unknown;
+  direccion?: string;
+  telefono?: string;
+  telefono_whatsapp?: string;
+  email?: string;
 }
 
+let nombreTienda = "Cubaclick";
+let logoUrl: string | null = null;
+let config: ConfigTienda = {};
+
 try {
-  const resConfig = await fetch(`${API_URL}/api/configuracion?populate=*`);
+  const resConfig = await fetch(`${getApiUrl()}/configuracion?populate=*`);
 
   if (resConfig.ok) {
     const configData = await resConfig.json();
-    const config = configData?.data || configData || {};
-    nombreTienda = config.nombre_tienda || "Cubaclick";
-    logoUrl = extraerUrlImagen(config.logo);
+    const raw: ConfigTienda = configData?.data ?? configData ?? {};
+
+    config = raw;
+    nombreTienda = raw.nombre_tienda || "Cubaclick";
+    logoUrl = getStrapiMediaOrNull(raw.logo);
+  } else {
+    console.warn(
+      `[Layout] No se pudo cargar /configuracion (status ${resConfig.status}). Usando valores por defecto.`
+    );
   }
 } catch (error) {
-  console.error("Error al cargar datos del header:", error);
+  console.error("[Layout] Error al cargar datos del header:", error);
 }
 
-// Optimizar las imágenes
-const optimizeImage = (url: string, width: number = 80): string => {
-  if (!url) return "";
-
-  if (url.includes("/upload/")) {
-    return url.replace("/upload/", `/upload/f_auto,q_auto,w_${width},c_fill/`);
-  }
-
-  return url;
-};
-
-const finalLogo = logoUrl
-  ? optimizeImage(logoUrl.startsWith("http") ? logoUrl : `${API_URL}${logoUrl}`, 100)
-  : "";
+// El logo se optimiza solo si existe. Si no hay logo, `finalLogo` queda en null
+// y el template renderiza el emoji 🛒 en su lugar.
+const finalLogo = logoUrl ? optimizeCloudinary(logoUrl, 100) : null;
 ---
 
 <html lang="es">
@@ -58,7 +59,7 @@ const finalLogo = logoUrl
       <div class="header-inner">
         <div class="header-left" id="btn-info-tienda">
           {
-            logoUrl ? (
+            finalLogo ? (
               <img src={finalLogo} alt={nombreTienda} class="header-logo" loading="eager" />
             ) : (
               <div
@@ -98,8 +99,7 @@ const finalLogo = logoUrl
 </html>
 
 <script>
-  const API_URL =
-    import.meta.env.PUBLIC_API_URL || "https://tienda-backend-production-9f16.up.railway.app";
+  import { getApiUrl, parseRichText } from "@/utils/strapi-core";
 
   interface InfoTienda {
     descripcion: string;
@@ -108,44 +108,31 @@ const finalLogo = logoUrl
     email: string;
   }
 
-  function richTextToPlainText(blocks: any[]): string {
-    if (!blocks || !Array.isArray(blocks)) return "Información no disponible.";
-    return blocks
-      .map((block: any) => {
-        if (block.children && Array.isArray(block.children)) {
-          return block.children.map((child: any) => child.text || "").join("");
-        }
-        return "";
-      })
-      .filter((text: string) => text.trim() !== "")
-      .join("\n");
-  }
-
   async function cargarInfoTienda(): Promise<InfoTienda | null> {
     try {
-      const res = await fetch(`${API_URL}/api/configuracion?populate=*`);
-      if (res.ok) {
-        const data = await res.json();
-        const config = data?.data || {};
-        let descripcion = "Información no disponible.";
-        if (config.descripcion_tienda) {
-          if (typeof config.descripcion_tienda === "string") {
-            descripcion = config.descripcion_tienda;
-          } else if (Array.isArray(config.descripcion_tienda)) {
-            descripcion = richTextToPlainText(config.descripcion_tienda);
-          }
-        }
-        return {
-          descripcion,
-          direccion: config.direccion || "No especificada",
-          telefono: config.telefono || config.telefono_whatsapp || "No especificado",
-          email: config.email || "No especificado",
-        };
+      const res = await fetch(`${getApiUrl()}/configuracion?populate=*`);
+      if (!res.ok) return null;
+
+      const data = await res.json();
+      const config = data?.data ?? {};
+
+      let descripcion = "Información no disponible.";
+      if (typeof config.descripcion_tienda === "string") {
+        descripcion = config.descripcion_tienda;
+      } else if (Array.isArray(config.descripcion_tienda)) {
+        descripcion = parseRichText(config.descripcion_tienda);
       }
+
+      return {
+        descripcion,
+        direccion: config.direccion || "No especificada",
+        telefono: config.telefono || config.telefono_whatsapp || "No especificado",
+        email: config.email || "No especificado",
+      };
     } catch (e) {
       console.error("Error cargando info:", e);
+      return null;
     }
-    return null;
   }
 
   function abrirModal(info: InfoTienda | null): void {
@@ -153,6 +140,7 @@ const finalLogo = logoUrl
     const body = document.getElementById("modal-body");
     const title = document.getElementById("modal-title");
     if (!modal || !body || !title) return;
+
     if (info) {
       title.textContent = "Quiénes Somos";
       const descripcionHTML = info.descripcion.replace(/\n/g, "<br>");
@@ -167,6 +155,7 @@ const finalLogo = logoUrl
     } else {
       body.textContent = "No se pudo cargar la información.";
     }
+
     modal.style.display = "flex";
     document.body.style.overflow = "hidden";
   }
@@ -195,11 +184,6 @@ const finalLogo = logoUrl
 
   window.addEventListener("scroll", () => {
     if (!header) return;
-
-    if (window.scrollY > 20) {
-      header.classList.add("scrolled");
-    } else {
-      header.classList.remove("scrolled");
-    }
+    header.classList.toggle("scrolled", window.scrollY > 20);
   });
 </script>

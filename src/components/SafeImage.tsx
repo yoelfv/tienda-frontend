@@ -1,15 +1,6 @@
 import { useMemo, useState } from "react";
 import type { ImgHTMLAttributes } from "react";
-
-const optimizeImage = (url: string, width = 240): string => {
-  if (!url) return "";
-
-  if (url.includes("/upload/")) {
-    return url.replace("/upload/", `/upload/f_auto,q_auto:eco,w_${width}/`);
-  }
-
-  return url;
-};
+import { optimizeCloudinary } from "@/utils/strapi-media";
 
 interface SafeImageProps extends ImgHTMLAttributes<HTMLImageElement> {
   src?: string;
@@ -29,9 +20,7 @@ export default function SafeImage({
 }: SafeImageProps) {
   const [imgSrc, setImgSrc] = useState<string>(src || fallback);
 
-  const optimizedSrc = useMemo(() => {
-    return optimizeImage(imgSrc, width);
-  }, [imgSrc, width]);
+  const optimizedSrc = useMemo(() => optimizeCloudinary(imgSrc, width), [imgSrc, width]);
 
   const handleError = () => {
     if (imgSrc !== fallback) {

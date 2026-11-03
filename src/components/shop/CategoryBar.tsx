@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 
-import { getStrapiMedia } from "@/services/api";
+import { getStrapiMedia } from "@/utils/strapi-media";
 
 import type { Category } from "@/types/category";
 
@@ -77,7 +77,7 @@ export default function CategoryBar({ categories, activeCategory, onSelect }: Ca
         >
           {category.image?.url ? (
             <img
-              src={getStrapiMedia(category.image.url)}
+              src={getStrapiMedia(category.image)}
               className="cat-chip-img"
               alt={category.name}
             />

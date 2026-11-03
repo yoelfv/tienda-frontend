@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getStrapiMedia } from "@/services/api";
+import { getStrapiMedia, optimizeCloudinaryLightbox } from "@/utils/strapi-media";
 import ProductGridSkeleton from "./ProductGridSkeleton";
 
 import AddToCart from "@/components/AddToCart";
@@ -61,16 +61,8 @@ interface ProductCardWithLightboxProps extends ProductCardProps {
 }
 
 function ProductCard({ product, onImageClick }: ProductCardWithLightboxProps) {
-  const imageSrc = getStrapiMedia(product.image?.url);
-
-  // URL optimizada para el lightbox:
-  // - w_auto:100:1600 → ancho del dispositivo (2x para Retina), con límite 1600px
-  // - c_limit         → no agranda imágenes más allá de su tamaño original
-  // - f_auto          → formato óptimo (WebP/AVIF si el navegador lo soporta)
-  // - q_auto:good     → calidad alta pero optimizada
-  const optimizedImageSrc = imageSrc.includes("/upload/")
-    ? imageSrc.replace("/upload/", "/upload/w_auto:100:1600,c_limit,f_auto,q_auto:good/")
-    : imageSrc;
+  const imageSrc = getStrapiMedia(product.image);
+  const optimizedImageSrc = optimizeCloudinaryLightbox(imageSrc);
 
   return (
     <div className="card">
