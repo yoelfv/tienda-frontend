@@ -70,23 +70,6 @@ Related repository:
 
 tienda-backend – Strapi Backend
 
-Project Structure
-
-src/
-├── components/
-│ ├── checkout/
-│ ├── shop/
-│ └── ui/
-├── constants/
-├── hooks/
-├── layouts/
-├── pages/
-├── services/
-├── store/
-├── styles/
-├── types/
-└── utils/
-
 Getting Started
 
 Prerequisites
