@@ -1,12 +1,23 @@
 import type { CartItem } from "@/types/product";
 import type { CheckoutFormData } from "@/types/checkout";
 
+/**
+ * Valida que un teléfono sea "razonablemente" válido.
+ * - Permite: +, dígitos, espacios, guiones, paréntesis.
+ * - Requiere: entre 6 y 15 dígitos reales (ignorando los símbolos).
+ */
 export function validatePhone(phone: string): boolean {
-  const cleaned = phone.replace(/[\s-]/g, "");
+  if (!phone.trim()) return false;
 
-  const phoneRegex = /^(\+?\d{1,3})?[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}$/;
+  // 1. Contar solo los dígitos
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 6 || digits.length > 15) return false;
 
-  return phoneRegex.test(cleaned) && cleaned.length >= 8;
+  // 2. Verificar que no haya caracteres extraños (solo permite +, números, espacios, (), -)
+  const validCharactersRegex = /^\+?[\d\s\-()]+$/;
+  if (!validCharactersRegex.test(phone)) return false;
+
+  return true;
 }
 
 export function validateCheckout(formData: CheckoutFormData, cart: CartItem[]): string | null {
@@ -15,21 +26,21 @@ export function validateCheckout(formData: CheckoutFormData, cart: CartItem[]): 
   }
 
   if (
-    !formData.senderName ||
-    !formData.senderPhone ||
-    !formData.recipientName ||
-    !formData.recipientPhone ||
-    !formData.address
+    !formData.senderName?.trim() ||
+    !formData.senderPhone?.trim() ||
+    !formData.recipientName?.trim() ||
+    !formData.recipientPhone?.trim() ||
+    !formData.address?.trim()
   ) {
     return "Por favor completa todos los campos obligatorios";
   }
 
   if (!validatePhone(formData.senderPhone)) {
-    return "El número de teléfono de quien envía no es válido";
+    return "El teléfono de quien envía debe tener entre 6 y 15 dígitos.";
   }
 
   if (!validatePhone(formData.recipientPhone)) {
-    return "El número de teléfono de quien recibe no es válido";
+    return "El teléfono de quien recibe debe tener entre 6 y 15 dígitos.";
   }
 
   return null;
