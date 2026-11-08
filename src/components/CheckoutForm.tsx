@@ -5,7 +5,7 @@ import { getCart, clearCart, saveCart } from "@/store/cart";
 import { getConfig } from "@/services/api";
 import { useCheckoutForm } from "@/hooks/useCheckoutForm";
 
-import { validatePhone, validateCheckout } from "@/utils/checkoutValidators";
+import { validateCheckout } from "@/utils/checkoutValidators";
 import { buildWhatsAppMessage } from "@/utils/buildWhatsAppMessage";
 import { validateCartOnCheckout } from "@/services/validateCartOnCheckout";
 
